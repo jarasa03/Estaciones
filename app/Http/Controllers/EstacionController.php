@@ -8,6 +8,7 @@ use App\Models\EstacionInv;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\Return_;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class EstacionController extends Controller
 {
@@ -78,25 +79,33 @@ class EstacionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(int $id)
     {
         try {
-            // Obtener  valores
-            $estaciones = EstacionInv::with('estado')->find($id);
+            // Intentamos obtener la estación por ID o lanzamos una excepción si no se encuentra
+            $estacion = EstacionInv::with('estado')->findOrFail($id);
+
+            // Mapear los datos de la estación a una estructura más simple para la respuesta
             $datos = [
-                'id' => $estaciones->id,
-                'nombre' => $estaciones->nombre,
-                'provincia' => $estaciones->provincia,
-                'idema' => $estaciones->idema,
-                'x' => $estaciones->latitud,
-                'y' => $estaciones->longitud,
-                'altitud' => $estaciones->altitud,
-                'estado' => optional($estaciones->estado)->estado, // Evita error si no tiene estado
+                'id' => $estacion->id,
+                'nombre' => $estacion->nombre,
+                'provincia' => $estacion->provincia,
+                'idema' => $estacion->idema,
+                'x' => $estacion->latitud,
+                'y' => $estacion->longitud,
+                'altitud' => $estacion->altitud,
+                'estado' => $estacion->estado ? ($estacion->estado->estado == 1 ? 'active' : 'inactive') : 'inactive'
             ];
 
+            // Retornar los datos de la estación como JSON con un código de estado 201
             return response()->json($datos, 201);
+        } catch (ModelNotFoundException $e) {
+            // Si la estación no es encontrada, retornar error 404
+            return response()->json(['error' => 'Estación no encontrada'], 404);
         } catch (Exception $e) {
-            return response()->json(['error' => 'Error al obtener estaciones'], 500);
+            // Capturamos el error general y lo registramos en el log
+            Log::error('Error al obtener estación: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener estación'], 500);
         }
     }
 
