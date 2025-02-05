@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Estacion;
+use Exception;
 use App\Models\EstacionInv;
 use Illuminate\Http\Request;
 use PhpParser\Node\Stmt\Return_;
+use Illuminate\Support\Facades\Log;
 
 class EstacionController extends Controller
 {
@@ -14,29 +16,37 @@ class EstacionController extends Controller
      */
     public function index()
     {
-        {
-            try {
-             
-                $estaciones = EstacionInv::with('estado')->get();
-                $datos = $estaciones->map(function ($estacion) {
-                    return [
-                        'id' => $estacion->id,
-                        'nombre' => $estacion->nombre,
-                        'provincia' => $estacion->provincia,
-                        'idema' => $estacion->idema,
-                        'x' => $estacion->latitud,
-                        'y' => $estacion->longitud,
-                        'altitud' => $estacion->altitud,
-                        'estado' => optional($estacion->estado)->estado // Evita error si no tiene estado
-                    ];
-                });
-        
-                return response()->json($datos, 201); 
-            } catch (\Exception $e) {
-                return response()->json(['error' => 'Error al obtener estaciones'], 500);
-            }
+        try {
+            // Se obtienen todas las estaciones junto con su estado relacionado
+            // "with('estado')" hace que se cargue la relación 'estado' (esto evita consultas extra)
+            $estaciones = EstacionInv::with('estado')->get()->transform(function ($estacion) {
+                // Aquí estamos creando una nueva estructura para cada estación.
+                return [
+                    // Estos son los atributos de la estación que queremos devolver
+                    'id' => $estacion->id,
+                    'nombre' => $estacion->nombre,
+                    'provincia' => $estacion->provincia,
+                    'idema' => $estacion->idema,
+                    'x' => $estacion->latitud,
+                    'y' => $estacion->longitud,
+                    'altitud' => $estacion->altitud,
+                    // Aquí manejamos el estado de la estación.
+                    // Si la estación tiene un estado (relación cargada con 'estado'),
+                    // se comprueba si ese estado es 1. Si es 1, asignamos 'active', si no, 'inactive'.
+                    // Si no tiene estado asociado, también se devuelve 'inactive'.
+                    'estado' => $estacion->estado ? ($estacion->estado->estado == 1 ? 'active' : 'inactive') : 'inactive'
+                ];
+            });
+            // Finalmente, se devuelve la colección de estaciones en formato JSON con un código de respuesta 201
+            return response()->json($estaciones, 201);
+        } catch (Exception $e) {
+            // Si ocurre algún error durante el proceso, lo capturamos aquí
+            // Se guarda un log con el mensaje de error y se devuelve un error genérico
+            Log::error('Error al obtener estaciones: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener estaciones'], 500);
         }
     }
+
     /**
      * Show the form for creating a new resource.
      */
@@ -50,21 +60,19 @@ class EstacionController extends Controller
      */
     public function store(Request $request)
     {
-        try{
-
-            $estacion= new EstacionInv();
-            $estacion->nombre=$request->nombre;
-            $estacion->idema=$request->idema;
-            $estacion->provincia=$request->provincia;
-            $estacion->latitud=$request->x;
-            $estacion->longitud=$request->y;
-            $estacion->altitud=$request->altitud;
+        try {
+            $estacion = new EstacionInv();
+            $estacion->nombre = $request->nombre;
+            $estacion->idema = $request->idema;
+            $estacion->provincia = $request->provincia;
+            $estacion->latitud = $request->x;
+            $estacion->longitud = $request->y;
+            $estacion->altitud = $request->altitud;
             $estacion->save();
-            return response()->json($request,201);
-        }catch(\Exception $e){
-            return response()->json(['error'=>"error al importar las estaciones"],500);
+            return response()->json($request, 201);
+        } catch (Exception $e) {
+            return response()->json(['error' => "error al importar las estaciones"], 500);
         }
-
     }
 
     /**
@@ -75,7 +83,7 @@ class EstacionController extends Controller
         try {
             // Obtener  valores
             $estaciones = EstacionInv::with('estado')->find($id);
-            $datos =[
+            $datos = [
                 'id' => $estaciones->id,
                 'nombre' => $estaciones->nombre,
                 'provincia' => $estaciones->provincia,
@@ -86,12 +94,12 @@ class EstacionController extends Controller
                 'estado' => optional($estaciones->estado)->estado, // Evita error si no tiene estado
             ];
 
-            return response()->json($datos, 201); 
-        } catch (\Exception $e) {
+            return response()->json($datos, 201);
+        } catch (Exception $e) {
             return response()->json(['error' => 'Error al obtener estaciones'], 500);
         }
     }
-    
+
 
     /**
      * Show the form for editing the specified resource.
@@ -118,8 +126,8 @@ class EstacionController extends Controller
             // Obtener  valores
             $estaciones = EstacionInv::find($id);
             $estaciones->delete();
-        }catch(\Exception $e){
-            return response()->json(["error" => "Error al eliminar"],500);
+        } catch (Exception $e) {
+            return response()->json(["error" => "Error al eliminar"], 500);
         }
     }
 }
