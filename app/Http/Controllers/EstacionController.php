@@ -13,7 +13,14 @@ use Throwable; // Importar Throwable
 class EstacionController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Obtiene y devuelve la lista de todas las estaciones con su estado asociado.
+     *
+     * Este método recupera todas las estaciones desde la base de datos,
+     * incluyendo su relación con la tabla de estados, y transforma los datos en un formato simplificado.
+     *
+     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con la lista de estaciones o un error en caso de fallo.
+     *
+     * @throws \Throwable Captura cualquier excepción y devuelve un error con código 500.
      */
     public function index()
     {
@@ -56,27 +63,47 @@ class EstacionController extends Controller
         //
     }
 
+    /**
+     * Almacena una nueva estación en la base de datos.
+     *
+     * Este método crea un nuevo registro en la tabla `estacion_inv` con los datos proporcionados
+     * y luego crea un registro asociado en la tabla `estacion_bd` para gestionar su estado.
+     *
+     * @param Request $request Contiene los datos de la estación a crear:
+     *  - string $nombre     Nombre de la estación.
+     *  - string $idema      Identificador de la estación.
+     *  - string $provincia  Provincia donde se ubica la estación.
+     *  - float  $x          Latitud de la estación.
+     *  - float  $y          Longitud de la estación.
+     *  - int    $altitud    Altitud de la estación.
+     *  - int    $estado     Estado de la estación (activo/inactivo).
+     *
+     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con los datos de la estación creada o un error en caso de fallo.
+     *
+     * @throws \Throwable Captura cualquier excepción y devuelve un error con código 500.
+     */
     public function store(Request $request)
     {
         try {
-            // Crear la nueva estación en estacion_inv
+            // Crear una nueva estación en la tabla estacion_inv
             $estacion = new EstacionInv();
             $estacion->nombre = $request->nombre;
             $estacion->idema = $request->idema;
             $estacion->provincia = $request->provincia;
-            $estacion->latitud = $request->x;
-            $estacion->longitud = $request->y;
+            $estacion->latitud = $request->x; // Guardamos la latitud
+            $estacion->longitud = $request->y; // Guardamos la longitud
             $estacion->altitud = $request->altitud;
             $estacion->save();
-            $estacion->refresh();
+            $estacion->refresh(); // Recargar el modelo para obtener el ID generado
 
-            // Insertar en estacion_bd con el mismo id y el estado proporcionado
+            // Crear una entrada en estacion_bd con el mismo ID
             $estacionBd = new EstacionBd();
-            $estacionBd->id = $estacion->id; // Usamos el mismo ID generado en estacion_inv
-            $estacionBd->estado = $request->estado; // Activado o desactivado
+            $estacionBd->id = $estacion->id; // Asociamos el mismo ID de estacion_inv
+            $estacionBd->estado = $request->estado; // Guardamos el estado (activo/inactivo)
             $estacionBd->save();
-            $estacionBd->refresh();
+            $estacionBd->refresh(); // Recargar el modelo
 
+            // Retornar la respuesta con los datos creados
             return response()->json([
                 'id' => $estacion->id,
                 'nombre' => $estacion->nombre,
@@ -88,33 +115,47 @@ class EstacionController extends Controller
                 'estado' => $estacionBd->estado
             ], 201);
         } catch (Throwable $e) {
+            // Registrar el error y retornar una respuesta con código 500
             Log::error('Error al insertar la estación: ' . $e->getMessage());
             return response()->json(['error' => "Error al insertar la estación: " . $e->getMessage()], 500);
         }
     }
 
+
     /**
-     * Display the specified resource.
+     * Obtiene los datos de una estación por su ID.
+     *
+     * Este método busca en la base de datos una estación con el ID proporcionado.
+     * Si el ID no es un número válido, retorna un error 500.
+     * Si la estación no existe, retorna un error 404.
+     * En caso contrario, devuelve los datos de la estación en formato JSON con estado 201.
+     *
+     * @param mixed $id El identificador de la estación (se validará como entero).
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con los datos de la estación o un mensaje de error.
      */
     public function show($id)
     {
         try {
             // Validamos que el ID sea un número entero
             if (!ctype_digit(strval($id))) {
-                return response()->json(['error' => 'Error al obtener estacion'], 500);
-                Log::error('Error al obtener la estación: ' . $e->getMessage());
+                Log::error('Error al obtener la estación: ID inválido.');
+                return response()->json(['error' => 'Error al obtener estación'], 500);
             }
 
-            $id = (int) $id; // Convertimos a entero después de validar
+            // Convertimos el ID a entero después de validar
+            $id = (int) $id;
 
-            // Intentamos obtener la estación por ID o lanzamos una excepción si no se encuentra
+            // Buscamos la estación en la base de datos o lanzamos una excepción si no se encuentra
             $estacion = EstacionInv::findOrFail($id);
+
+            // Buscamos el estado en la tabla asociada
             $estado = EstacionBd::where('id', $id)->first();
 
+            // Registramos los datos obtenidos en el log
             Log::info("Datos de estación: " . json_encode($estacion));
             Log::info("Datos de estado: " . json_encode($estado));
 
-            // Mapear los datos de la estación a una estructura más simple para la respuesta
+            // Estructuramos la respuesta con los datos de la estación
             $datos = [
                 'id' => $estacion->id,
                 'nombre' => $estacion->nombre,
@@ -126,13 +167,14 @@ class EstacionController extends Controller
                 'estado' => $estacion->estado ? ($estacion->estado->estado == 1 ? 'active' : 'inactive') : 'inactive'
             ];
 
-            // Retornar los datos de la estación como JSON con un código de estado 201
+            // Retornamos la información de la estación en formato JSON con código 201
             return response()->json($datos, 201);
         } catch (ModelNotFoundException $e) {
-            // Si la estación no es encontrada, retornar error 404
-            return response()->json(['error' => 'Estacion no encontrada'], 404);
+            // Si la estación no se encuentra, retornamos un error 404
+            return response()->json(['error' => 'Estación no encontrada'], 404);
         }
     }
+
 
 
     /**
