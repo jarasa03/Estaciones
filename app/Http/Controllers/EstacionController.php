@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Estacion;
+use App\Models\EstacionBd;
 use Exception;
 use App\Models\EstacionInv;
 use Illuminate\Http\Request;
-use PhpParser\Node\Stmt\Return_;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Throwable; // Importar Throwable
 
 class EstacionController extends Controller
 {
@@ -40,7 +40,7 @@ class EstacionController extends Controller
             });
             // Finalmente, se devuelve la colección de estaciones en formato JSON con un código de respuesta 201
             return response()->json($estaciones, 201);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             // Si ocurre algún error durante el proceso, lo capturamos aquí
             // Se guarda un log con el mensaje de error y se devuelve un error genérico
             Log::error('Error al obtener estaciones: ' . $e->getMessage());
@@ -56,12 +56,11 @@ class EstacionController extends Controller
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try {
+
+            // Crear la nueva estación en estacion_inv
             $estacion = new EstacionInv();
             $estacion->nombre = $request->nombre;
             $estacion->idema = $request->idema;
@@ -70,20 +69,46 @@ class EstacionController extends Controller
             $estacion->longitud = $request->y;
             $estacion->altitud = $request->altitud;
             $estacion->save();
-            return response()->json($request, 201);
-        } catch (Exception $e) {
-            return response()->json(['error' => "error al importar las estaciones"], 500);
+            $estacion->refresh();
+
+            // Insertar en estacion_bd con el mismo id y el estado proporcionado
+            $estacionBd = new EstacionBd();
+            $estacionBd->id = $estacion->id; // Usamos el mismo ID generado en estacion_inv
+            $estacionBd->estado = $request->estado; // Activado o desactivado
+            $estacionBd->save();
+            $estacionBd->refresh();
+
+            return response()->json([
+                'message' => 'Estación creada correctamente',
+                'estacion' => $estacion,
+                'estado' => $estacionBd->estado
+            ], 201);
+        } catch (Throwable $e) {
+            Log::error('Error al insertar la estación: ' . $e->getMessage());
+            return response()->json(['error' => "Error al insertar la estación: " . $e->getMessage()], 500);
         }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show($id)
     {
         try {
+            // Validamos que el ID sea un número entero
+            if (!ctype_digit(strval($id))) {
+                return response()->json(['error' => 'Error al obtener estacion'], 500);
+                Log::error('Error al obtener la estación: ' . $e->getMessage());
+            }
+
+            $id = (int) $id; // Convertimos a entero después de validar
+            
             // Intentamos obtener la estación por ID o lanzamos una excepción si no se encuentra
-            $estacion = EstacionInv::with('estado')->findOrFail($id);
+            $estacion = EstacionInv::findOrFail($id);
+            $estado = EstacionBd::where('id', $id)->first();
+
+            Log::info("Datos de estación: " . json_encode($estacion));
+            Log::info("Datos de estado: " . json_encode($estado));
 
             // Mapear los datos de la estación a una estructura más simple para la respuesta
             $datos = [
@@ -101,12 +126,8 @@ class EstacionController extends Controller
             return response()->json($datos, 201);
         } catch (ModelNotFoundException $e) {
             // Si la estación no es encontrada, retornar error 404
-            return response()->json(['error' => 'Estación no encontrada'], 404);
-        } catch (Exception $e) {
-            // Capturamos el error general y lo registramos en el log
-            Log::error('Error al obtener estación: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al obtener estación'], 500);
-        }
+            return response()->json(['error' => 'Estacion no encontrada'], 404);
+        } 
     }
 
 

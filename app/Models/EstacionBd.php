@@ -26,6 +26,8 @@ class EstacionBd extends Model
 	protected $table = 'estacion_bd';
 	public $incrementing = false;
 	public $timestamps = false;
+	protected $primaryKey = 'id';
+	protected $keyType = 'int';
 
 	protected $casts = [
 		'id' => 'int',
