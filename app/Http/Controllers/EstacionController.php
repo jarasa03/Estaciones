@@ -59,7 +59,6 @@ class EstacionController extends Controller
     public function store(Request $request)
     {
         try {
-
             // Crear la nueva estación en estacion_inv
             $estacion = new EstacionInv();
             $estacion->nombre = $request->nombre;
@@ -79,8 +78,13 @@ class EstacionController extends Controller
             $estacionBd->refresh();
 
             return response()->json([
-                'message' => 'Estación creada correctamente',
-                'estacion' => $estacion,
+                'id' => $estacion->id,
+                'nombre' => $estacion->nombre,
+                'idema' => $estacion->idema,
+                'provincia' => $estacion->provincia,
+                'latitud' => $estacion->latitud,
+                'longitud' => $estacion->longitud,
+                'altitud' => $estacion->altitud,
                 'estado' => $estacionBd->estado
             ], 201);
         } catch (Throwable $e) {
@@ -102,7 +106,7 @@ class EstacionController extends Controller
             }
 
             $id = (int) $id; // Convertimos a entero después de validar
-            
+
             // Intentamos obtener la estación por ID o lanzamos una excepción si no se encuentra
             $estacion = EstacionInv::findOrFail($id);
             $estado = EstacionBd::where('id', $id)->first();
@@ -127,7 +131,7 @@ class EstacionController extends Controller
         } catch (ModelNotFoundException $e) {
             // Si la estación no es encontrada, retornar error 404
             return response()->json(['error' => 'Estacion no encontrada'], 404);
-        } 
+        }
     }
 
 
