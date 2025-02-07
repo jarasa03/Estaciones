@@ -196,12 +196,22 @@ class EstacionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(int $id)
     {
         try {
-            // Obtener  valores
-            $estaciones = EstacionInv::find($id);
-            $estaciones->delete();
+            // Eliminar primero el registro dependiente
+            $estaciones = EstacionInv::where('id', $id)->first();
+            if ($estaciones) {
+                $estaciones->delete();
+            }
+    
+            // Luego eliminar el registro principal
+            $estado = EstacionBd::where('id', $id)->first();
+            if ($estado) {
+                $estado->delete();
+            }
+    
+            return response()->json(["message" => "Eliminado correctamente"], 200);
         } catch (Exception $e) {
             return response()->json(["error" => "Error al eliminar"], 500);
         }
