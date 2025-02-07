@@ -30,10 +30,12 @@ class EstacionController extends Controller
      *
      * Este método recupera todas las estaciones desde la base de datos,
      * incluyendo su relación con la tabla de estados, y transforma los datos en un formato simplificado.
+     * Cada estación incluye su ID, nombre, provincia, identificador, coordenadas (latitud y longitud), 
+     * altitud, y el estado de la estación (activo/inactivo).
      *
      * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con la lista de estaciones o un error en caso de fallo.
-     *
-     * @throws \Throwable Captura cualquier excepción y devuelve un error con código 500.
+     * 
+     * @throws \Throwable Captura cualquier excepción durante el proceso y devuelve un error con código 500.
      */
     public function index()
     {
@@ -82,6 +84,9 @@ class EstacionController extends Controller
      * Este método crea un nuevo registro en la tabla `estacion_inv` con los datos proporcionados
      * y luego crea un registro asociado en la tabla `estacion_bd` para gestionar su estado.
      *
+     * La función valida los datos de entrada antes de procesarlos, y en caso de error de validación, 
+     * devuelve una respuesta con detalles específicos del error.
+     *
      * @param Request $request Contiene los datos de la estación a crear:
      *  - string $nombre     Nombre de la estación.
      *  - string $idema      Identificador de la estación.
@@ -93,7 +98,8 @@ class EstacionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con los datos de la estación creada o un error en caso de fallo.
      *
-     * @throws \Throwable Captura cualquier excepción y devuelve un error con código 500.
+     * @throws \Illuminate\Validation\ValidationException Si los datos no pasan la validación, se lanza una excepción con los errores específicos de validación.
+     * @throws \Throwable Captura cualquier excepción no controlada y devuelve un error con código 500.
      */
     public function store(Request $request)
     {
@@ -159,13 +165,18 @@ class EstacionController extends Controller
     /**
      * Obtiene los datos de una estación por su ID.
      *
-     * Este método busca en la base de datos una estación con el ID proporcionado.
-     * Si el ID no es un número válido, retorna un error 500.
-     * Si la estación no existe, retorna un error 404.
-     * En caso contrario, devuelve los datos de la estación en formato JSON con estado 201.
+     * Este método busca en la base de datos una estación con el ID proporcionado. 
+     * Si el ID no es válido (no es un número entero), se retorna un error 500.
+     * Si la estación no existe, se retorna un error 404. Si se encuentra la estación,
+     * se devuelve una respuesta en formato JSON con los detalles de la estación, 
+     * incluyendo su estado (activo/inactivo).
      *
      * @param mixed $id El identificador de la estación (se validará como entero).
-     * @return \Illuminate\Http\JsonResponse Respuesta JSON con los datos de la estación o un mensaje de error.
+     * 
+     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con los datos de la estación, 
+     * o un mensaje de error si la estación no se encuentra o si hay un problema con el ID.
+     * 
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si la estación no se encuentra.
      */
     public function show($id)
     {
@@ -214,10 +225,18 @@ class EstacionController extends Controller
     }
 
     /**
-     * Elimina una estación de la base de datos si existe en alguna de las dos tablas.
+     * Elimina una estación de la base de datos si existe en alguna de las dos tablas (`estacion_bd` o `estacion_inv`).
      *
-     * @param int|string $id El ID de la estación a eliminar.
-     * @return JsonResponse Respuesta en formato JSON con el resultado de la operación.
+     * Este método intenta eliminar la estación con el ID proporcionado, buscando primero en la tabla `estacion_bd`
+     * y luego en la tabla `estacion_inv`. Si no se encuentra la estación en ninguna de las tablas, se retorna un error 404.
+     * Si se encuentra y elimina correctamente, se devuelve un mensaje de éxito.
+     * En caso de cualquier error, se retorna un mensaje de error 500.
+     *
+     * @param int|string $id El ID de la estación a eliminar. Puede ser un número entero o una cadena que represente el ID.
+     * 
+     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con el resultado de la operación.
+     * 
+     * @throws \Exception Si ocurre un error durante el proceso de eliminación, se captura y retorna un error con código 500.
      */
     public function destroy($id): JsonResponse
     {
