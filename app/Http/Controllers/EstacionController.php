@@ -9,9 +9,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Throwable; // Importar Throwable
+use Illuminate\Http\JsonResponse;
 
 class EstacionController extends Controller
 {
+
+    private function validarId($id)
+    {
+        if (!filter_var($id, FILTER_VALIDATE_INT)) {
+            Log::error("ID inválido recibido: {$id}");
+            abort(400, "ID inválido");
+        }
+        return (int) $id;
+    }
+
+
     /**
      * Obtiene y devuelve la lista de todas las estaciones con su estado asociado.
      *
@@ -84,22 +96,32 @@ class EstacionController extends Controller
      */
     public function store(Request $request)
     {
+        $data = $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'idema'     => 'required|string|max:50',
+            'provincia' => 'required|string|max:255',
+            'x'         => 'required|numeric',
+            'y'         => 'required|numeric',
+            'altitud'   => 'required|integer',
+            'estado'    => 'required|integer'
+        ]);
         try {
             // Crear una nueva estación en la tabla estacion_inv
             $estacion = new EstacionInv();
-            $estacion->nombre = $request->nombre;
-            $estacion->idema = $request->idema;
-            $estacion->provincia = $request->provincia;
-            $estacion->latitud = $request->x; // Guardamos la latitud
-            $estacion->longitud = $request->y; // Guardamos la longitud
-            $estacion->altitud = $request->altitud;
+            $estacion = new EstacionInv();
+            $estacion->nombre = $data['nombre'];
+            $estacion->idema = $data['idema'];
+            $estacion->provincia = $data['provincia'];
+            $estacion->latitud = $data['x']; // Guardamos la latitud
+            $estacion->longitud = $data['y']; // Guardamos la longitud
+            $estacion->altitud = $data['altitud'];
             $estacion->save();
             $estacion->refresh(); // Recargar el modelo para obtener el ID generado
 
             // Crear una entrada en estacion_bd con el mismo ID
             $estacionBd = new EstacionBd();
             $estacionBd->id = $estacion->id; // Asociamos el mismo ID de estacion_inv
-            $estacionBd->estado = $request->estado; // Guardamos el estado (activo/inactivo)
+            $estacionBd->estado = $data['estado']; // Guardamos el estado (activo/inactivo)
             $estacionBd->save();
             $estacionBd->refresh(); // Recargar el modelo
 
@@ -136,27 +158,15 @@ class EstacionController extends Controller
     public function show($id)
     {
         try {
-            // Validamos que el ID sea un número entero
-            if (!ctype_digit(strval($id))) {
-                Log::error('Error al obtener la estación: ID inválido.');
-                return response()->json(['error' => 'Error al obtener estación'], 500);
-            }
+            // Validamos el ID antes de continuar
+            $id = $this->validarId($id);
 
-            // Convertimos el ID a entero después de validar
-            $id = (int) $id;
+            $estacion = EstacionInv::with('estado')->findOrFail($id);
 
-            // Buscamos la estación en la base de datos o lanzamos una excepción si no se encuentra
-            $estacion = EstacionInv::findOrFail($id);
+            Log::info("Datos de estación obtenidos correctamente: " . json_encode($estacion));
 
-            // Buscamos el estado en la tabla asociada
-            $estado = EstacionBd::where('id', $id)->first();
-
-            // Registramos los datos obtenidos en el log
-            Log::info("Datos de estación: " . json_encode($estacion));
-            Log::info("Datos de estado: " . json_encode($estado));
-
-            // Estructuramos la respuesta con los datos de la estación
-            $datos = [
+            // Retornamos la respuesta
+            return response()->json([
                 'id' => $estacion->id,
                 'nombre' => $estacion->nombre,
                 'provincia' => $estacion->provincia,
@@ -165,12 +175,10 @@ class EstacionController extends Controller
                 'y' => $estacion->longitud,
                 'altitud' => $estacion->altitud,
                 'estado' => $estacion->estado ? ($estacion->estado->estado == 1 ? 'active' : 'inactive') : 'inactive'
-            ];
-
-            // Retornamos la información de la estación en formato JSON con código 201
-            return response()->json($datos, 201);
+            ], 201);
         } catch (ModelNotFoundException $e) {
             // Si la estación no se encuentra, retornamos un error 404
+            Log::error('Estación no encontrada: ' . $e->getMessage());
             return response()->json(['error' => 'Estación no encontrada'], 404);
         }
     }
@@ -194,31 +202,38 @@ class EstacionController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Elimina una estación de la base de datos si existe en alguna de las dos tablas.
+     *
+     * @param int|string $id El ID de la estación a eliminar.
+     * @return JsonResponse Respuesta en formato JSON con el resultado de la operación.
      */
-    public function destroy(int $id)
+    public function destroy($id): JsonResponse
     {
         try {
-             
-             $estado = EstacionBd::where('id', $id)->first();
-             if ($estado) {
-                 $estado->delete();
-             }else{
-                return response()->json(["message"=>"No existe"]);
-             }
-     
-           
-            $estaciones = EstacionInv::where('id', $id)->first();
-            if ($estaciones) {
-                $estaciones->delete();
-            }else{
-                return response()->json(["message"=>"No existe"]);
-             }
-    
-           
-            return response()->json(["message" => "Eliminado correctamente"], 200);
+            Log::info("Intentando eliminar estación con ID: {$id}");
+
+            // Validamos el ID antes de continuar
+            $id = $this->validarId($id);
+
+            $estacionBd = EstacionBd::find($id);
+            $estacionInv = EstacionInv::find($id);
+
+            // Si no se encuentra en ninguna tabla, retornamos un error 404
+            if (!$estacionBd && !$estacionInv) {
+                Log::warning("No se encontró ninguna estación con ID {$id}");
+                return response()->json(["message" => "La estación {$id} no existe"], 404);
+            }
+
+            // Eliminamos si existen
+            $estacionBd?->delete();
+            $estacionInv?->delete();
+
+            Log::info("Estación con ID {$id} eliminada correctamente");
+
+            return response()->json(["message" => "Estación {$id} eliminada correctamente"], 200);
         } catch (Exception $e) {
-            return response()->json(["error" => "Error al eliminar"], 500);
+            Log::error("Error al eliminar estación con ID {$id}: " . $e->getMessage());
+            return response()->json(["error" => "Error al eliminar estación con id {$id}"], 500);
         }
     }
 }
