@@ -14,7 +14,16 @@ use Illuminate\Validation\ValidationException;
 
 class EstacionController extends Controller
 {
-
+    /**
+     * Valida que el ID proporcionado sea un número entero válido.
+     *
+     * Esta función verifica si el ID proporcionado es un valor entero válido utilizando el filtro FILTER_VALIDATE_INT. 
+     * Si el ID no es válido, se registra un error en los logs y se aborta la solicitud con un código de estado 400.
+     *
+     * @param mixed $id El ID a validar, que puede ser cualquier tipo.
+     * @return int El ID validado como entero.
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException Si el ID no es válido, se lanza un error con código 400.
+     */
     private function validarId($id)
     {
         if (!filter_var($id, FILTER_VALIDATE_INT)) {
@@ -22,6 +31,27 @@ class EstacionController extends Controller
             abort(400, "ID inválido");
         }
         return (int) $id;
+    }
+
+    /**
+     * Función externa para validar los datos de la estación.
+     *
+     * @param Request $request El objeto de la solicitud HTTP.
+     * @return array Los datos validados de la estación.
+     * @throws ValidationException Si la validación falla.
+     */
+    private function validarEstacion(Request $request)
+    {
+        Log::info("Iniciando validación de los datos.");
+        return $request->validate([
+            'nombre'    => 'required|string|max:255',
+            'idema'     => 'required|string|max:50',
+            'provincia' => 'required|string|max:255',
+            'x'         => 'required|numeric',
+            'y'         => 'required|numeric',
+            'altitud'   => 'required|integer',
+            'estado'    => 'required|integer'
+        ]);
     }
 
 
@@ -106,15 +136,7 @@ class EstacionController extends Controller
         try {
             // Validación de datos
             Log::info("Validando datos de la estación.");
-            $data = $request->validate([
-                'nombre'    => 'required|string|max:255',
-                'idema'     => 'required|string|max:50',
-                'provincia' => 'required|string|max:255',
-                'x'         => 'required|numeric',
-                'y'         => 'required|numeric',
-                'altitud'   => 'required|integer',
-                'estado'    => 'required|integer'
-            ]);
+            $data = $this->validarEstacion($request);
             Log::info("Datos validados correctamente.", ['data' => $data]);
         } catch (ValidationException $e) {
             // Si la validación falla, captura la excepción y devuelve un error personalizado
