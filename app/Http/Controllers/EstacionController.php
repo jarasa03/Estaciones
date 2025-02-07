@@ -8,8 +8,9 @@ use App\Models\EstacionInv;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Throwable; // Importar Throwable
+use Throwable;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Validation\ValidationException;
 
 class EstacionController extends Controller
 {
@@ -96,15 +97,26 @@ class EstacionController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'nombre'    => 'required|string|max:255',
-            'idema'     => 'required|string|max:50',
-            'provincia' => 'required|string|max:255',
-            'x'         => 'required|numeric',
-            'y'         => 'required|numeric',
-            'altitud'   => 'required|integer',
-            'estado'    => 'required|integer'
-        ]);
+        try {
+            // Validación de datos
+            $data = $request->validate([
+                'nombre'    => 'required|string|max:255',
+                'idema'     => 'required|string|max:50',
+                'provincia' => 'required|string|max:255',
+                'x'         => 'required|numeric',
+                'y'         => 'required|numeric',
+                'altitud'   => 'required|integer',
+                'estado'    => 'required|integer'
+            ]);
+        } catch (ValidationException $e) {
+            // Si la validación falla, captura la excepción y devuelve un error personalizado
+            Log::error('Error al validar los datos: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Datos inválidos',
+                'message' => 'Por favor revisa los campos proporcionados.',
+                'details' => $e->errors() // Devuelve los errores específicos de la validación
+            ], 422); // Código de estado 422 para errores de validación
+        }
         try {
             // Crear una nueva estación en la tabla estacion_inv
             $estacion = new EstacionInv();
