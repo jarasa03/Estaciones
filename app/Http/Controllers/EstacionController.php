@@ -105,6 +105,7 @@ class EstacionController extends Controller
     {
         try {
             // Validación de datos
+            Log::info("Validando datos de la estación.");
             $data = $request->validate([
                 'nombre'    => 'required|string|max:255',
                 'idema'     => 'required|string|max:50',
@@ -114,9 +115,10 @@ class EstacionController extends Controller
                 'altitud'   => 'required|integer',
                 'estado'    => 'required|integer'
             ]);
+            Log::info("Datos validados correctamente.", ['data' => $data]);
         } catch (ValidationException $e) {
             // Si la validación falla, captura la excepción y devuelve un error personalizado
-            Log::error('Error al validar los datos: ' . $e->getMessage());
+            Log::error('Error al validar los datos: ' . $e->getMessage(), ['errors' => $e->errors()]);
             return response()->json([
                 'error' => 'Datos inválidos',
                 'message' => 'Por favor revisa los campos proporcionados.',
@@ -125,6 +127,7 @@ class EstacionController extends Controller
         }
         try {
             // Crear una nueva estación en la tabla estacion_inv
+            Log::info("Creando nueva estación en la tabla 'estacion_inv'.");
             $estacion = new EstacionInv();
             $estacion = new EstacionInv();
             $estacion->nombre = $data['nombre'];
@@ -136,14 +139,20 @@ class EstacionController extends Controller
             $estacion->save();
             $estacion->refresh(); // Recargar el modelo para obtener el ID generado
 
+            Log::info("Estación creada en 'estacion_inv' con ID: {$estacion->id}");
+
             // Crear una entrada en estacion_bd con el mismo ID
+            Log::info("Creando nueva entrada en la tabla 'estacion_bd' con el ID: {$estacion->id}.");
             $estacionBd = new EstacionBd();
             $estacionBd->id = $estacion->id; // Asociamos el mismo ID de estacion_inv
             $estacionBd->estado = $data['estado']; // Guardamos el estado (activo/inactivo)
             $estacionBd->save();
             $estacionBd->refresh(); // Recargar el modelo
 
+            Log::info("Entrada creada en 'estacion_bd' con estado: {$estacionBd->estado}");
+
             // Retornar la respuesta con los datos creados
+            Log::info("Retornando datos de la estación creada.");
             return response()->json([
                 'id' => $estacion->id,
                 'nombre' => $estacion->nombre,
@@ -156,7 +165,7 @@ class EstacionController extends Controller
             ], 201);
         } catch (Throwable $e) {
             // Registrar el error y retornar una respuesta con código 500
-            Log::error('Error al insertar la estación: ' . $e->getMessage());
+            Log::error('Error al insertar la estación: ' . $e->getMessage(), ['exception' => $e]);
             return response()->json(['error' => "Error al insertar la estación: " . $e->getMessage()], 500);
         }
     }
@@ -182,11 +191,14 @@ class EstacionController extends Controller
     {
         try {
             // Validamos el ID antes de continuar
+            Log::info("Validando ID de la estación: {$id}");
             $id = $this->validarId($id);
 
+            // Intentamos obtener la estación con el ID proporcionado
             $estacion = EstacionInv::with('estado')->findOrFail($id);
 
-            Log::info("Datos de estación obtenidos correctamente: " . json_encode($estacion));
+            // Log de éxito con detalles de la estación
+            Log::info("Datos de estación obtenidos correctamente: ID: {$estacion->id}, Nombre: {$estacion->nombre}");
 
             // Retornamos la respuesta
             return response()->json([
@@ -200,9 +212,13 @@ class EstacionController extends Controller
                 'estado' => $estacion->estado ? ($estacion->estado->estado == 1 ? 'active' : 'inactive') : 'inactive'
             ], 201);
         } catch (ModelNotFoundException $e) {
-            // Si la estación no se encuentra, retornamos un error 404
-            Log::error('Estación no encontrada: ' . $e->getMessage());
+            // Si la estación no se encuentra, logueamos el error y retornamos 404
+            Log::error("Estación no encontrada para ID {$id}: " . $e->getMessage());
             return response()->json(['error' => 'Estación no encontrada'], 404);
+        } catch (Exception $e) {
+            // Log de errores generales en caso de que ocurra alguna otra excepción
+            Log::error("Error al obtener datos de la estación con ID {$id}: " . $e->getMessage());
+            return response()->json(['error' => 'Error al obtener datos de la estación'], 500);
         }
     }
 
@@ -245,6 +261,7 @@ class EstacionController extends Controller
 
             // Validamos el ID antes de continuar
             $id = $this->validarId($id);
+            Log::info("ID validado correctamente: {$id}");
 
             $estacionBd = EstacionBd::find($id);
             $estacionInv = EstacionInv::find($id);
@@ -256,8 +273,15 @@ class EstacionController extends Controller
             }
 
             // Eliminamos si existen
-            $estacionBd?->delete();
-            $estacionInv?->delete();
+            if ($estacionBd) {
+                $estacionBd->delete();
+                Log::info("Estación eliminada de la tabla estacion_bd con ID {$id}");
+            }
+
+            if ($estacionInv) {
+                $estacionInv->delete();
+                Log::info("Estación eliminada de la tabla estacion_inv con ID {$id}");
+            }
 
             Log::info("Estación con ID {$id} eliminada correctamente");
 
