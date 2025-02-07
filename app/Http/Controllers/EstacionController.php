@@ -199,18 +199,23 @@ class EstacionController extends Controller
     public function destroy(int $id)
     {
         try {
-            // Eliminar primero el registro dependiente
+             
+             $estado = EstacionBd::where('id', $id)->first();
+             if ($estado) {
+                 $estado->delete();
+             }else{
+                return response()->json(["message"=>"No existe"]);
+             }
+     
+           
             $estaciones = EstacionInv::where('id', $id)->first();
             if ($estaciones) {
                 $estaciones->delete();
-            }
+            }else{
+                return response()->json(["message"=>"No existe"]);
+             }
     
-            // Luego eliminar el registro principal
-            $estado = EstacionBd::where('id', $id)->first();
-            if ($estado) {
-                $estado->delete();
-            }
-    
+           
             return response()->json(["message" => "Eliminado correctamente"], 200);
         } catch (Exception $e) {
             return response()->json(["error" => "Error al eliminar"], 500);
