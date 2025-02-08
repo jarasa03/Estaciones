@@ -7,8 +7,9 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/estaciones', [EstacionController::class, 'index']);
-// Route::get('/estaciones/{id}', [EstacionController::class, 'show'])->where('id', '^[1-9]$|^[1-9][0-9]$|^100$'); /* Get por id solo del 1 al 100 y positivos*/
-Route::get('/estaciones/{id}', [EstacionController::class, 'show']); /* Get por id solo del 1 al 100 y positivos*/
-Route::post('/post', [EstacionController::class, 'store']); /* post */
-Route::delete('/delete/{id}', [EstacionController::class, 'destroy']); /* post */
+// Rutas relacionadas con "Estaciones"
+Route::get('/estaciones', [EstacionController::class, 'index']); // Obtener todas las estaciones
+Route::get('/estaciones/{id}', [EstacionController::class, 'show']); // Obtener una estación específica por su ID
+Route::post('/estaciones', [EstacionController::class, 'store']); // Crear una nueva estación
+Route::put('/estaciones/{id}', [EstacionController::class, 'update']); // Actualizar una estación existente
+Route::delete('/estaciones/{id}', [EstacionController::class, 'destroy']); // Eliminar una estación por su ID
