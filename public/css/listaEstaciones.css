@@ -41,3 +41,18 @@ th {
 #ficha {
     text-align: center;
 }
+
+#ficha a {
+    display: inline-block;
+    text-decoration: none;
+    color: white;
+    background-color: #5dabfe;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+    margin: 0 auto;
+}
+
+#ficha a:hover {
+    background-color: #84bfff;
+}

@@ -37,11 +37,12 @@
                     <td class="num">{{ $estacion->longitud }}</td>
                     <td class="num">{{ $estacion->altitud }}</td>
                     <td>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
-                    <td id="ficha"><a href="{{ route('estaciones.ficha', ['id' => $estacion->id]) }}">Ver ficha</a></td>
+                    <td id="ficha"><a href="{{ route('estaciones.ficha', ['id' => $estacion->id]) }}">Ver ficha</a>
+                    </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7">No hay estaciones disponibles.</td>
+                    <td colspan="8">No hay estaciones disponibles.</td>
                 </tr>
             @endforelse
         </tbody>
