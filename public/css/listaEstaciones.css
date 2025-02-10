@@ -6,13 +6,17 @@ body {
 table {
     border-collapse: collapse;
     width: 100%;
+    table-layout: fixed;
+}
+
+th {
+    text-align: center;
 }
 
 th,
 td {
     border: 1px solid #ddd;
     padding: 8px;
-    text-align: left;
 }
 
 th {
