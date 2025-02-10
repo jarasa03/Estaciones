@@ -24,18 +24,20 @@
                 <th scope="col">Longitud</th>
                 <th scope="col">Altitud</th>
                 <th scope="col">Estado</th>
+                <th scope="col">Ver ficha</th>
             </tr>
         </thead>
         <tbody>
             @forelse ($estaciones as $estacion)
                 <tr>
-                    <td>{{ $estacion->id }}</td>
+                    <td class="num">{{ $estacion->id }}</td>
                     <td>{{ $estacion->nombre }}</td>
                     <td>{{ $estacion->provincia }}</td>
-                    <td>{{ $estacion->latitud }}</td>
-                    <td>{{ $estacion->longitud }}</td>
-                    <td>{{ $estacion->altitud }}</td>
+                    <td class="num">{{ $estacion->latitud }}</td>
+                    <td class="num">{{ $estacion->longitud }}</td>
+                    <td class="num">{{ $estacion->altitud }}</td>
                     <td>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
+                    <td id="ficha"><a href="{{ route('estaciones.ficha', ['id' => $estacion->id]) }}">Ver ficha</a></td>
                 </tr>
             @empty
                 <tr>
