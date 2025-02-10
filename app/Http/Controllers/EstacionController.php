@@ -254,7 +254,7 @@ class EstacionController extends Controller
         //
     }
 
-    public function update(Request $request, $id)
+    public function updateEstado(Request $request, $id)
     {
         try {
             // Validar que solo el campo 'estado' esté presente y sea booleano

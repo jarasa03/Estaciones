@@ -11,5 +11,5 @@ Route::get('/user', function (Request $request) {
 Route::get('/estacion', [EstacionController::class, 'index']); // Obtener todas las estaciones
 Route::get('/estacion/{id}', [EstacionController::class, 'show']); // Obtener una estación específica por su ID
 Route::post('/estacion', [EstacionController::class, 'store']); // Crear una nueva estación
-Route::put('/estacion/{id}', [EstacionController::class, 'update']); // Actualizar una estación existente
+Route::put('/estacion/{id}', [EstacionController::class, 'updateEstado']); // Actualizar una estación existente
 Route::delete('/estacion/{id}', [EstacionController::class, 'destroy']); // Eliminar una estación por su ID
