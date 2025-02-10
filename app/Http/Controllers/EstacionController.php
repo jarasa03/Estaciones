@@ -254,73 +254,42 @@ class EstacionController extends Controller
         //
     }
 
-    /**
-     * Actualiza los datos de una estación existente en la base de datos.
-     *
-     * @param Request $request Contiene los datos actualizados de la estación.
-     * @param int|string $id El ID de la estación a actualizar.
-     * 
-     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con los datos actualizados o un mensaje de error.
-     */
     public function update(Request $request, $id)
     {
         try {
-            // Validamos el ID antes de continuar
-            Log::info("Validando ID de la estación para actualización: {$id}");
-            $id = $this->validarId($id);
+            // Validar que solo el campo 'estado' esté presente y sea booleano
+            $request->validate([
+                'estado' => 'required|boolean',
+            ]);
 
-            // Validamos los datos del request
-            Log::info("Validando los datos de actualización.");
-            $data = $this->validarEstacion($request);
-
-            // Intentamos encontrar la estación en la base de datos
-            $estacion = EstacionInv::findOrFail($id);
-
-            // Actualizamos los datos de la estación
-            $estacion->nombre = $data['nombre'];
-            $estacion->idema = $data['idema'];
-            $estacion->provincia = $data['provincia'];
-            $estacion->latitud = $data['x'];
-            $estacion->longitud = $data['y'];
-            $estacion->altitud = $data['altitud'];
-            $estacion->save();
-
-            Log::info("Estación actualizada correctamente con ID: {$estacion->id}");
-
-            // También actualizamos el estado en la tabla estacion_bd
-            $estacionBd = EstacionBd::find($id);
-            if ($estacionBd) {
-                $estacionBd->estado = $data['estado'];
-                $estacionBd->save();
-                Log::info("Estado actualizado en 'estacion_bd' para ID: {$id}");
+            // Verificar si hay algún otro campo en el request
+            if (count($request->all()) > 1) {
+                return response()->json(["message" => "Solo se permite editar el campo 'estado'"], 400);
             }
 
-            return response()->json([
-                'id' => $estacion->id,
-                'nombre' => $estacion->nombre,
-                'idema' => $estacion->idema,
-                'provincia' => $estacion->provincia,
-                'latitud' => $estacion->latitud,
-                'longitud' => $estacion->longitud,
-                'altitud' => $estacion->altitud,
-                'estado' => $estacionBd ? $estacionBd->estado : null
-            ], 200);
-        } catch (ValidationException $e) {
-            Log::error('Error de validación en actualización: ' . $e->getMessage());
-            return response()->json([
-                'error' => 'Datos inválidos',
-                'message' => 'Por favor revisa los campos proporcionados.',
-                'details' => $e->errors()
-            ], 422);
-        } catch (ModelNotFoundException $e) {
-            Log::error("Estación no encontrada con ID: {$id}");
-            return response()->json(['error' => 'Estación no encontrada'], 404);
-        } catch (Throwable $e) {
-            Log::error("Error al actualizar la estación con ID {$id}: " . $e->getMessage());
-            return response()->json(['error' => 'Error al actualizar la estación'], 500);
+            // Validar el id
+            $id = $this->validarId($id);
+            Log::info("ID validado correctamente: {$id}");
+
+            // Buscar en ambas tablas
+            $estacionBd = EstacionBd::find($id);
+
+            if (!$estacionBd) {
+                Log::warning("No se encontró ninguna estación en estacion_bd con ID {$id}");
+                return response()->json(["message" => "La estación {$id} no existe en estacion_bd"], 404);
+            }
+
+            // Actualizar el estado en estacion_bd
+            $estacionBd->estado = $request->estado;
+            $estacionBd->save();
+            Log::info("Estado actualizado en estacion_bd con ID {$id}");
+
+            return response()->json(["message" => "Estado actualizado correctamente para la estación {$id}"], 200);
+        } catch (\Exception $e) {
+            Log::error("Error al actualizar estación con ID {$id}: " . $e->getMessage());
+            return response()->json(["error" => "Error al actualizar estación con ID {$id}"], 500);
         }
     }
-
 
     /**
      * Elimina una estación de la base de datos si existe en alguna de las dos tablas (`estacion_bd` o `estacion_inv`).
