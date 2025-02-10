@@ -54,7 +54,6 @@ class EstacionController extends Controller
         ]);
     }
 
-
     /**
      * Obtiene y devuelve la lista de todas las estaciones con su estado asociado.
      *
@@ -182,7 +181,6 @@ class EstacionController extends Controller
             return response()->json(['error' => "Error al insertar la estación: " . $e->getMessage()], 500);
         }
     }
-
 
     /**
      * Obtiene los datos de una estación por su ID.
