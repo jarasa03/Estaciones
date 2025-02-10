@@ -279,6 +279,12 @@ class EstacionController extends Controller
                 return response()->json(["message" => "La estación {$id} no existe en estacion_bd"], 404);
             }
 
+            // Comprobar si el estado actual ya es el mismo que el que se quiere establecer
+            if ($estacionBd->estado === $request->estado) {
+                Log::info("El estado ya está configurado como {$request->estado} en estacion_bd con ID {$id}");
+                return response()->json(["message" => "El estado ya está configurado como se quiere para la estación {$id}"], 200);
+            }
+
             // Actualizar el estado en estacion_bd
             $estacionBd->estado = $request->estado;
             $estacionBd->save();
