@@ -15,6 +15,17 @@ use Throwable;
 class EstacionController extends Controller
 {
 
+    public function fichaEstacion($id)
+    {
+        $estacion = EstacionInv::find($id); // Busca la estación por ID
+
+        if (!$estacion) {
+            abort(404, 'Estación no encontrada');
+        }
+
+        return view('estaciones.FichaEstacion', compact('estacion'));
+    }
+
     public function index()
     {
         // Recuperar todas las estaciones
