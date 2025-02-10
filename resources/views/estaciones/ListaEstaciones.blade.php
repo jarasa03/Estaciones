@@ -13,16 +13,17 @@
 <body>
     <h1>Lista de Estaciones</h1>
 
-    <table border="1">
+    <table class="estacion-table">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Nombre</th>
-                <th>Provincia</th>
-                <th>Latitud</th>
-                <th>Longitud</th>
-                <th>Altitud</th>
-                <th>Estado</th>
+                {{-- Atributo scope para accesibilidad en encabezados para screen readers --}}
+                <th scope="col">ID</th>
+                <th scope="col">Nombre</th>
+                <th scope="col">Provincia</th>
+                <th scope="col">Latitud</th>
+                <th scope="col">Longitud</th>
+                <th scope="col">Altitud</th>
+                <th scope="col">Estado</th>
             </tr>
         </thead>
         <tbody>
@@ -34,24 +35,7 @@
                     <td>{{ $estacion->latitud }}</td>
                     <td>{{ $estacion->longitud }}</td>
                     <td>{{ $estacion->altitud }}</td>
-                    <td>
-                        <!-- Lógica para mostrar 'inactive' o 'active' -->
-                        @php
-                            $estado =
-                                is_object($estacion->estado) || is_array($estacion->estado)
-                                    ? $estacion->estado['estado']
-                                    : $estacion->estado;
-                        @endphp
-
-                        <!-- Mostrar 'inactive' si estado es 0 o null, 'active' si es 1 -->
-                        @if ($estado === 0 || $estado === null)
-                            Inactive
-                        @elseif($estado === 1)
-                            Active
-                        @else
-                            {{ $estado }} <!-- En caso de que sea otro valor inesperado -->
-                        @endif
-                    </td>
+                    <td>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
                 </tr>
             @empty
                 <tr>
@@ -60,7 +44,9 @@
             @endforelse
         </tbody>
     </table>
-    {{ $estaciones->links() }} <!-- Esto agregará los controles de paginación -->
+    <div id="pagination">
+        {{ $estaciones->links('pagination::bootstrap-4') }} {{-- Esto agregará los controles de paginación --}}
+    </div>
 </body>
 
 </html>

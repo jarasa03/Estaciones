@@ -39,6 +39,7 @@ class ComposerStaticInitb725b0c8d1f5ad8308d0fac72c00643e
         'ce9671a430e4846b44e1c68c7611f9f5' => __DIR__ . '/..' . '/mockery/mockery/library/Mockery.php',
         'a1cfe24d14977df6878b9bf804af2d1c' => __DIR__ . '/..' . '/nunomaduro/collision/src/Adapters/Phpunit/Autoload.php',
         'ec07570ca5a812141189b1fa81503674' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Assert/Functions.php',
+        '1017e02bb51333700c944167f9c4d42e' => __DIR__ . '/../..' . '/app/Helpers/EstadoHelper.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -541,6 +542,7 @@ class ComposerStaticInitb725b0c8d1f5ad8308d0fac72c00643e
     );
 
     public static $classMap = array (
+        'App\\Helpers\\EstadoHelper' => __DIR__ . '/../..' . '/app/Helpers/EstadoHelper.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\EstacionController' => __DIR__ . '/../..' . '/app/Http/Controllers/EstacionController.php',
         'App\\Models\\Cache' => __DIR__ . '/../..' . '/app/Models/Cache.php',
