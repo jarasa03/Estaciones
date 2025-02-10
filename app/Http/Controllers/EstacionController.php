@@ -24,7 +24,7 @@ class EstacionController extends Controller
      * @return int El ID validado como entero.
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException Si el ID no es válido, se lanza un error con código 400.
      */
-    private function validarId($id)
+    private function validarIdEntero($id)
     {
         if (!filter_var($id, FILTER_VALIDATE_INT)) {
             Log::error("ID inválido recibido: {$id}");
@@ -40,7 +40,7 @@ class EstacionController extends Controller
      * @return array Los datos validados de la estación.
      * @throws ValidationException Si la validación falla.
      */
-    private function validarEstacion(Request $request)
+    private function validarDatosEstacion(Request $request)
     {
         Log::info("Iniciando validación de los datos.");
         return $request->validate([
@@ -66,7 +66,7 @@ class EstacionController extends Controller
      * 
      * @throws Throwable Captura cualquier excepción durante el proceso y devuelve un error con código 500.
      */
-    public function index()
+    public function listarEstaciones()
     {
         try {
             // Se obtienen todas las estaciones junto con su estado relacionado
@@ -122,12 +122,12 @@ class EstacionController extends Controller
      * @throws \Illuminate\Validation\ValidationException Si los datos no pasan la validación, se lanza una excepción con los errores específicos de validación.
      * @throws Throwable Captura cualquier excepción no controlada y devuelve un error con código 500.
      */
-    public function store(Request $request)
+    public function crearEstacion(Request $request)
     {
         try {
             // Validación de datos
             Log::info("Validando datos de la estación.");
-            $data = $this->validarEstacion($request);
+            $data = $this->validarDatosEstacion($request);
             Log::info("Datos validados correctamente.", ['data' => $data]);
         } catch (ValidationException $e) {
             // Si la validación falla, captura la excepción y devuelve un error personalizado
@@ -198,12 +198,12 @@ class EstacionController extends Controller
      * 
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si la estación no se encuentra.
      */
-    public function show($id)
+    public function obtenerEstacion($id)
     {
         try {
             // Validamos el ID antes de continuar
             Log::info("Validando ID de la estación: {$id}");
-            $id = $this->validarId($id);
+            $id = $this->validarIdEntero($id);
 
             // Intentamos obtener la estación con el ID proporcionado
             $estacion = EstacionInv::with('estado')->findOrFail($id);
@@ -247,7 +247,7 @@ class EstacionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse La respuesta JSON con un mensaje de éxito o error.
      */
-    public function updateEstado(Request $request, $id)
+    public function actualizarEstadoEstacion(Request $request, $id)
     {
         try {
             // Validar que solo el campo 'estado' esté presente y sea booleano
@@ -305,13 +305,13 @@ class EstacionController extends Controller
      * 
      * @throws Exception Si ocurre un error durante el proceso de eliminación, se captura y retorna un error con código 500.
      */
-    public function destroy($id): JsonResponse
+    public function eliminarEstacion($id): JsonResponse
     {
         try {
             Log::info("Intentando eliminar estación con ID: {$id}");
 
             // Validamos el ID antes de continuar
-            $id = $this->validarId($id);
+            $id = $this->validarIdEntero($id);
             Log::info("ID validado correctamente: {$id}");
 
             $estacionBd = EstacionBd::find($id);
