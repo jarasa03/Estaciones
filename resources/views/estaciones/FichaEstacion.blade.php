@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha de la Estación</title>
-    <link href="{{ asset('css/fichaEstacion.css') }}" rel="stylesheet"> <!-- Vincula el archivo CSS -->
+    <link href="{{ asset('css/fichaEstacion.css') }}" rel="stylesheet">
 </head>
 <body>
     <h1>Ficha de la Estación</h1>
