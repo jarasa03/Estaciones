@@ -3,14 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\EstacionBd;
-use Exception;
 use App\Models\EstacionInv;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Throwable;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Validation\ValidationException;
+use Exception;
+use Throwable;
 
 class EstacionController extends Controller
 {
@@ -65,7 +65,7 @@ class EstacionController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con la lista de estaciones o un error en caso de fallo.
      * 
-     * @throws \Throwable Captura cualquier excepción durante el proceso y devuelve un error con código 500.
+     * @throws Throwable Captura cualquier excepción durante el proceso y devuelve un error con código 500.
      */
     public function index()
     {
@@ -121,7 +121,7 @@ class EstacionController extends Controller
      * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con los datos de la estación creada o un error en caso de fallo.
      *
      * @throws \Illuminate\Validation\ValidationException Si los datos no pasan la validación, se lanza una excepción con los errores específicos de validación.
-     * @throws \Throwable Captura cualquier excepción no controlada y devuelve un error con código 500.
+     * @throws Throwable Captura cualquier excepción no controlada y devuelve un error con código 500.
      */
     public function store(Request $request)
     {
@@ -142,7 +142,6 @@ class EstacionController extends Controller
         try {
             // Crear una nueva estación en la tabla estacion_inv
             Log::info("Creando nueva estación en la tabla 'estacion_inv'.");
-            $estacion = new EstacionInv();
             $estacion = new EstacionInv();
             $estacion->nombre = $data['nombre'];
             $estacion->idema = $data['idema'];
@@ -288,7 +287,7 @@ class EstacionController extends Controller
             Log::info("Estado actualizado correctamente en estacion_bd. Estación con ID {$id} ahora tiene el estado {$request->estado}.");
 
             return response()->json(["message" => "Estado actualizado correctamente para la estación {$id}"], 200);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error("Error al actualizar la estación con ID {$id}: " . $e->getMessage(), ['exception' => $e]);
             return response()->json(["error" => "Error al actualizar estación con ID {$id}"], 500);
         }
@@ -306,7 +305,7 @@ class EstacionController extends Controller
      * 
      * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con el resultado de la operación.
      * 
-     * @throws \Exception Si ocurre un error durante el proceso de eliminación, se captura y retorna un error con código 500.
+     * @throws Exception Si ocurre un error durante el proceso de eliminación, se captura y retorna un error con código 500.
      */
     public function destroy($id): JsonResponse
     {
