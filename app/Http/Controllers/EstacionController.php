@@ -100,27 +100,22 @@ class EstacionController extends Controller
     }
 
     /**
-     * Almacena una nueva estación en la base de datos.
+     * Crea una nueva estación en las tablas `estacion_inv` y `estacion_bd`.
      *
-     * Este método crea un nuevo registro en la tabla `estacion_inv` con los datos proporcionados
-     * y luego crea un registro asociado en la tabla `estacion_bd` para gestionar su estado.
+     * Esta función valida los datos recibidos en la solicitud, crea una nueva estación en la tabla
+     * `estacion_inv` con la información proporcionada y luego crea una entrada correspondiente
+     * en la tabla `estacion_bd` con el estado de la estación.
+     * Si la validación de datos falla, devuelve un error con los detalles de la validación.
+     * Si ocurre un error durante la creación de la estación o la inserción en las tablas,
+     * devuelve un error con el mensaje correspondiente.
      *
-     * La función valida los datos de entrada antes de procesarlos, y en caso de error de validación, 
-     * devuelve una respuesta con detalles específicos del error.
-     *
-     * @param Request $request Contiene los datos de la estación a crear:
-     *  - string $nombre     Nombre de la estación.
-     *  - string $idema      Identificador de la estación.
-     *  - string $provincia  Provincia donde se ubica la estación.
-     *  - float  $x          Latitud de la estación.
-     *  - float  $y          Longitud de la estación.
-     *  - int    $altitud    Altitud de la estación.
-     *  - int    $estado     Estado de la estación (activo/inactivo).
-     *
-     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con los datos de la estación creada o un error en caso de fallo.
-     *
-     * @throws \Illuminate\Validation\ValidationException Si los datos no pasan la validación, se lanza una excepción con los errores específicos de validación.
-     * @throws Throwable Captura cualquier excepción no controlada y devuelve un error con código 500.
+     * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene los datos de la estación.
+     * 
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el ID de la máquina (estación) creada,
+     *         o un error con el mensaje adecuado si ocurre una excepción.
+     * 
+     * @throws \Illuminate\Validation\ValidationException Si la validación de los datos falla.
+     * @throws \Throwable Si ocurre un error durante la creación de la estación o la inserción en la base de datos.
      */
     public function crearEstacion(Request $request)
     {
@@ -134,7 +129,7 @@ class EstacionController extends Controller
             Log::error('Error al validar los datos: ' . $e->getMessage(), ['errors' => $e->errors()]);
             return response()->json([
                 'error' => 'Datos inválidos',
-                'message' => 'Por favor revisa los campos proporcionados.',
+                'message' => 'Por favor revisa los campos proporcionados',
                 'details' => $e->errors() // Devuelve los errores específicos de la validación
             ], 422); // Código de estado 422 para errores de validación
         }
@@ -163,17 +158,10 @@ class EstacionController extends Controller
 
             Log::info("Entrada creada en 'estacion_bd' con estado: {$estacionBd->estado}");
 
-            // Retornar la respuesta con los datos creados
+            // Retornar solo el id de la estación creada
             Log::info("Retornando datos de la estación creada.");
             return response()->json([
-                'id' => $estacion->id,
-                'nombre' => $estacion->nombre,
-                'idema' => $estacion->idema,
-                'provincia' => $estacion->provincia,
-                'latitud' => $estacion->latitud,
-                'longitud' => $estacion->longitud,
-                'altitud' => $estacion->altitud,
-                'estado' => $estacionBd->estado
+                'id' => $estacion->id
             ], 201);
         } catch (Throwable $e) {
             // Registrar el error y retornar una respuesta con código 500
