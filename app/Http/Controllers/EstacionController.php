@@ -14,6 +14,16 @@ use Throwable;
 
 class EstacionController extends Controller
 {
+
+    public function index()
+    {
+        // Recuperar todas las estaciones
+        $estaciones = EstacionInv::paginate(10);
+    
+        // Retornar la vista y pasar las estaciones
+        return view('estaciones.ListaEstaciones', compact('estaciones'));
+    }
+
     /**
      * Valida que el ID proporcionado sea un número entero válido.
      *
