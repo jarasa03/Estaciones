@@ -33,3 +33,11 @@ th {
         gap: 10px;
     }
 }
+
+.num {
+    text-align: right;
+}
+
+#ficha {
+    text-align: center;
+}
