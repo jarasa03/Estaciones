@@ -1,8 +1,25 @@
+@font-face {
+    font-family: 'LEMONMILK';
+    src: url('/fonts/LEMONMILK-Regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1 {
+    font-family: "LEMONMILK", sans-serif;
+    margin-top: 0;
+    text-align: center;
+    font-weight: 300;
+    color: #202932;
+    font-size: 40px;
+}
+
 * {
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     overflow: hidden;
 }
 
@@ -17,13 +34,6 @@ body {
     color: #fff;
     font-size: 1.6rem;
     font-family: 'Lato', sans-serif;
-}
-
-h1 {
-    margin-top: 0;
-    text-align: center;
-    font-weight: 300;
-    color: #202932;
 }
 
 table {
