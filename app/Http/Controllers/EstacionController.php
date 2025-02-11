@@ -15,6 +15,13 @@ use Throwable;
 class EstacionController extends Controller
 {
 
+    /**
+     * Muestra la ficha de una estación específica.
+     *
+     * @param int $id Identificador de la estación.
+     * @return \Illuminate\View\View Vista con la información de la estación.
+     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException Si la estación no se encuentra.
+     */
     public function fichaEstacion($id)
     {
         $estacion = EstacionInv::find($id); // Busca la estación por ID
@@ -26,6 +33,11 @@ class EstacionController extends Controller
         return view('estaciones.FichaEstacion', compact('estacion'));
     }
 
+    /**
+     * Muestra una lista paginada de estaciones.
+     *
+     * @return \Illuminate\View\View Vista con la lista de estaciones paginada.
+     */
     public function index()
     {
         // Recuperar todas las estaciones
