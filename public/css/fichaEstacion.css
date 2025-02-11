@@ -1,19 +1,77 @@
+/* ===========================
+   Variables globales
+=========================== */
+
+:root {
+    /* Colores principales de la interfaz */
+    --primary-color: #88e4e3;
+    --secondary-color: #4b908f;
+    --accent-color: #202932;
+    --text-color: #fff;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    /* Colores específicos de los botones */
+    --button-hover-bg: #3a7f77;
+    --button-hover-color: white;
+    /* Colores de la tabla */
+    --table-border-color: #28333f;
+    --table-even-bg: #242e39;
+    --table-odd-bg: #5BB9B8;
+    /* Colores de enlaces */
+    --link-color: #3b7d76;
+    --link-hover-color: rgb(253, 166, 5);
+    /* Fuentes */
+    --font-header: 'LEMONMILK', sans-serif;
+    --font-body: 'Lato', sans-serif;
+    /* Transiciones */
+    --transition-speed: 0.3s;
+    --transition-ease: ease;
+}
+
+
+/* ===========================
+   Fuentes personalizadas
+=========================== */
+
+@font-face {
+    font-family: 'LEMONMILK';
+    src: url('/fonts/LEMONMILK-Regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
 /* ========================= */
+
+
 /*       Global Styles       */
+
+
 /* ========================= */
+
 body {
     margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    background-color: #5BB9B8;
+    color: var(--text-color);
+    background-color: var(--primary-color);
+    font-family: var(--font-body);
+}
+
+* {
+    box-sizing: border-box;
 }
 
 
 /* ========================= */
+
+
 /*      Container Styles     */
+
+
 /* ========================= */
+
 #contenedorP {
     display: flex;
     align-items: center;
@@ -25,57 +83,88 @@ body {
     padding: 15px;
     background-color: #4b908f;
     border-radius: 8px;
-    box-shadow: #37414b 5px 5px 25px;
+    box-shadow: var(--shadow-color) 5px 5px 20px 5px;
 }
-
 
 #contenedorH {
     width: 300px;
     height: 350px;
 }
 
-
-/* ========================= */
-/*      Typography Styles    */
-/* ========================= */
-h1 {
-    font-size: 60px;
-    display: flex;
-    justify-content: center;
-    color: #333;
-     text-shadow: #37414b 5px 5px 25px;
+.button {
+    margin-top: 20px;
+    line-height: 1;
+    display: inline-block;
+    font-size: 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    color: var(--text-color);
+    padding: 8px;
+    font-family: var(--font-header);
+    background-color: var(--secondary-color);
+    transition: background-color var(--transition-speed) var(--transition-ease), transform var(--transition-speed) var(--transition-ease);
 }
 
-h3 {
-    color: white;
-    font-size: 35px;
-    display: flex;
-    justify-content:center;
+
+/* Estilo de los botones al pasar el cursor */
+
+.button:hover {
+    background-color: var(--button-hover-bg);
+    transform: scale(1.05);
+    color: var(--button-hover-color);
+}
+
+
+/* ========================= */
+
+
+/*      Typography Styles    */
+
+
+/* ========================= */
+
+h1 {
+    margin-top: 30px;
+    margin-bottom: 15px;
+    font-family: var(--font-header);
+    text-align: center;
+    font-weight: 300;
+    color: var(--accent-color);
+    font-size: 40px;
+    text-shadow: 2px 2px 4px var(--shadow-color);
+}
+
+#estacion {
+    font-size: 30px;
+    margin-top: 40px;
+    margin-bottom: 50px;
 }
 
 p {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    color: white;
+    color: var(--text-color);
     margin: 5px 0;
-    font-size: 25px;  
+    font-size: 20px;
+    font-family: var(--font-header);
 }
 
 span {
-    font-size: 20;
+    font-size: 20px;
     display: inline-block;
     text-align: right;
     margin-left: auto;
 }
 
 strong {
-    font-size: 20;
-    font-weight: bold;
-    color: white;
+    font-size: 20px;
+    font-weight: 100;
+    color: var(--text-color);
 }
-a{
-    text-decoration: none; 
-    font-size: 18px;       
-    color: white;
+
+a {
+    text-decoration: none;
+    font-size: 18px;
+    color: var(--text-color);
 }

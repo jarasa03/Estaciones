@@ -6,6 +6,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ficha de la Estación</title>
+
+    <!-- Preload de la fuente -->
+    <link rel="preload" href="{{ asset('fonts/LEMONMILK-Regular.otf') }}" as="font" type="font/otf"
+        crossorigin="anonymous">
+
+    <!-- CSS -->
     <link href="{{ asset('css/fichaEstacion.css') }}" rel="stylesheet">
 </head>
 
@@ -14,7 +20,7 @@
 
     <div id="contenedorP">
         <div id="contenedorH">
-            <h3>{{ $estacion->nombre }}</span></h3>
+            <h1 id="estacion">{{ $estacion->nombre }}</h1>
             <p><strong>ID:</strong> <span>{{ $estacion->id }}</span></p>
             <p><strong>Provincia:</strong> <span>{{ $estacion->provincia }}</span></p>
             <p><strong>Latitud:</strong> <span>{{ $estacion->latitud }}</span></p>
@@ -23,7 +29,7 @@
             <p><strong>Estado:</strong> <span>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</p>
         </div>
     </div>
-    <a href="{{ route('estaciones.index') }}">Volver a la lista de estaciones</a>
+    <a class="button" href="{{ route('estaciones.index') }}">Volver a la lista de estaciones</a>
 
 </body>
 
