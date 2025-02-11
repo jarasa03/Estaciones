@@ -16,7 +16,7 @@
     --table-border-color: #28333f;
     --table-even-bg: #242e39;
     --table-odd-bg: #5BB9B8;
-    /* Colores de enlaces */
+    /* Colores de los enlaces */
     --link-color: #3b7d76;
     --link-hover-color: rgb(253, 166, 5);
     /* Fuentes */
@@ -26,7 +26,6 @@
     --transition-speed: 0.3s;
     --transition-ease: ease;
 }
-
 
 /* ===========================
    Fuentes personalizadas
@@ -39,14 +38,9 @@
     font-style: normal;
 }
 
-
-/* ========================= */
-
-
-/*       Global Styles       */
-
-
-/* ========================= */
+/* ========================= 
+   Estilos globales
+=========================== */
 
 body {
     margin: 0;
@@ -63,14 +57,9 @@ body {
     box-sizing: border-box;
 }
 
-
-/* ========================= */
-
-
-/*      Container Styles     */
-
-
-/* ========================= */
+/* =========================
+   Estilos de contenedores
+=========================== */
 
 #contenedorP {
     display: flex;
@@ -81,7 +70,7 @@ body {
     width: 400px;
     margin: 20px;
     padding: 15px;
-    background-color: #4b908f;
+    background-color: var(--secondary-color);
     border-radius: 8px;
     box-shadow: var(--shadow-color) 5px 5px 20px 5px;
 }
@@ -105,23 +94,15 @@ body {
     transition: background-color var(--transition-speed) var(--transition-ease), transform var(--transition-speed) var(--transition-ease);
 }
 
-
-/* Estilo de los botones al pasar el cursor */
-
 .button:hover {
     background-color: var(--button-hover-bg);
     transform: scale(1.05);
     color: var(--button-hover-color);
 }
 
-
-/* ========================= */
-
-
-/*      Typography Styles    */
-
-
-/* ========================= */
+/* =========================
+   Estilos tipográficos
+=========================== */
 
 h1 {
     margin-top: 30px;
@@ -136,8 +117,8 @@ h1 {
 
 #estacion {
     font-size: 30px;
-    margin-top: 40px;
-    margin-bottom: 50px;
+    margin-top: 20px;
+    margin-bottom: 40px;
 }
 
 p {
