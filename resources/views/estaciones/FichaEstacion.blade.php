@@ -12,14 +12,16 @@
 <body>
     <h1>Ficha de la Estación</h1>
 
-    <div>
-        <h2>Nombre: {{ $estacion->nombre }}</h2>
-        <p><strong>ID:</strong> {{ $estacion->id }}</p>
-        <p><strong>Provincia:</strong> {{ $estacion->provincia }}</p>
-        <p><strong>Latitud:</strong> {{ $estacion->latitud }}</p>
-        <p><strong>Longitud:</strong> {{ $estacion->longitud }}</p>
-        <p><strong>Altitud:</strong> {{ $estacion->altitud }}</p>
-        <p><strong>Estado:</strong> {{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</p>
+    <div id="contenedorP">
+        <div id="contenedorH">
+            <h3>{{ $estacion->nombre }}</span></h3>
+            <p><strong>ID:</strong> <span>{{ $estacion->id }}</span></p>
+            <p><strong>Provincia:</strong> <span>{{ $estacion->provincia }}</span></p>
+            <p><strong>Latitud:</strong> <span>{{ $estacion->latitud }}</span></p>
+            <p><strong>Longitud:</strong> <span>{{ $estacion->longitud }}</span></p>
+            <p><strong>Altitud:</strong> <span>{{ $estacion->altitud }}</span></p>
+            <p><strong>Estado:</strong> <span>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</p>
+        </div>
     </div>
     <a href="{{ route('estaciones.index') }}">Volver a la lista de estaciones</a>
 

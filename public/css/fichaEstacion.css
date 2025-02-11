@@ -1,19 +1,81 @@
-h1 {
-    color: #333;
+/* ========================= */
+/*       Global Styles       */
+/* ========================= */
+body {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: #5BB9B8;
 }
 
-div {
+
+/* ========================= */
+/*      Container Styles     */
+/* ========================= */
+#contenedorP {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+    width: 400px;
     margin: 20px;
     padding: 15px;
-    background-color: #f4f4f4;
+    background-color: #4b908f;
     border-radius: 8px;
+    box-shadow: #37414b 5px 5px 25px;
+}
+
+
+#contenedorH {
+    width: 300px;
+    height: 350px;
+}
+
+
+/* ========================= */
+/*      Typography Styles    */
+/* ========================= */
+h1 {
+    font-size: 60px;
+    display: flex;
+    justify-content: center;
+    color: #333;
+     text-shadow: #37414b 5px 5px 25px;
+}
+
+h3 {
+    color: white;
+    font-size: 35px;
+    display: flex;
+    justify-content:center;
 }
 
 p {
-    font-size: 16px;
-    color: #555;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: white;
+    margin: 5px 0;
+    font-size: 25px;  
+}
+
+span {
+    font-size: 20;
+    display: inline-block;
+    text-align: right;
+    margin-left: auto;
 }
 
 strong {
+    font-size: 20;
     font-weight: bold;
+    color: white;
+}
+a{
+    text-decoration: none; 
+    font-size: 18px;       
+    color: white;
 }
