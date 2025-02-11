@@ -35,13 +35,13 @@
         <tbody>
             @forelse ($estaciones as $estacion)
                 <tr>
-                    <td class="num">{{ $estacion->id }}</td>
-                    <td class="letra">{{ $estacion->nombre }}</td>
-                    <td class="letra">{{ $estacion->provincia }}</td>
-                    <td class="num">{{ $estacion->latitud }}</td>
-                    <td class="num">{{ $estacion->longitud }}</td>
-                    <td class="num">{{ $estacion->altitud }}</td>
-                    <td class="letra">{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
+                    <td>{{ $estacion->id }}</td>
+                    <td>{{ $estacion->nombre }}</td>
+                    <td>{{ $estacion->provincia }}</td>
+                    <td>{{ $estacion->latitud }}</td>
+                    <td>{{ $estacion->longitud }}</td>
+                    <td>{{ $estacion->altitud }}</td>
+                    <td>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
                     <td id="ficha"><a class="button"
                             href="{{ route('estaciones.ficha', ['id' => $estacion->id]) }}">Ver ficha</a>
                     </td>

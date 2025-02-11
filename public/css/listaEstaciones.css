@@ -70,6 +70,10 @@ td,
 th {
     display: table-cell;
     padding: 10px;
+    text-align: left;
+}
+
+th:nth-of-type(8) {
     text-align: center;
 }
 
@@ -119,10 +123,6 @@ tr:nth-child(2n+1) td {
     list-style-type: none;
     display: flex;
     gap: 10px;
-}
-
-.num {
-    text-align: right;
 }
 
 .letra {
