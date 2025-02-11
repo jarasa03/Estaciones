@@ -7,12 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Estaciones</title>
     <link href="{{ asset('css/listaEstaciones.css') }}" rel="stylesheet">
-
 </head>
 
 <body>
     <h1>Lista de Estaciones</h1>
-
     <table class="estacion-table">
         <thead>
             <tr>
@@ -31,13 +29,13 @@
             @forelse ($estaciones as $estacion)
                 <tr>
                     <td class="num">{{ $estacion->id }}</td>
-                    <td>{{ $estacion->nombre }}</td>
-                    <td>{{ $estacion->provincia }}</td>
+                    <td class="letra">{{ $estacion->nombre }}</td>
+                    <td class="letra">{{ $estacion->provincia }}</td>
                     <td class="num">{{ $estacion->latitud }}</td>
                     <td class="num">{{ $estacion->longitud }}</td>
                     <td class="num">{{ $estacion->altitud }}</td>
-                    <td>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
-                    <td id="ficha"><a href="{{ route('estaciones.ficha', ['id' => $estacion->id]) }}">Ver ficha</a>
+                    <td class="letra">{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
+                    <td id="ficha"><a class="button" href="{{ route('estaciones.ficha', ['id' => $estacion->id]) }}">Ver ficha</a>
                     </td>
                 </tr>
             @empty

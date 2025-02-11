@@ -29,7 +29,7 @@ class EstacionController extends Controller
     public function index()
     {
         // Recuperar todas las estaciones
-        $estaciones = EstacionInv::paginate(10);
+        $estaciones = EstacionInv::paginate(9);
 
         // Retornar la vista y pasar las estaciones
         return view('estaciones.ListaEstaciones', compact('estaciones'));
