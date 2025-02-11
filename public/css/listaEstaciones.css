@@ -1,21 +1,36 @@
+/* ===========================
+   Variables globales
+=========================== */
+
 :root {
+    /* Colores principales de la interfaz */
     --primary-color: #88e4e3;
     --secondary-color: #4b908f;
     --accent-color: #202932;
     --text-color: #fff;
     --shadow-color: rgba(0, 0, 0, 0.2);
+    /* Colores específicos de los botones */
     --button-hover-bg: #3a7f77;
     --button-hover-color: white;
+    /* Colores de la tabla */
     --table-border-color: #28333f;
     --table-even-bg: #242e39;
     --table-odd-bg: #5BB9B8;
+    /* Colores de enlaces */
     --link-color: #3b7d76;
     --link-hover-color: rgb(253, 166, 5);
+    /* Fuentes */
     --font-header: 'LEMONMILK', sans-serif;
     --font-body: 'Lato', sans-serif;
+    /* Transiciones */
     --transition-speed: 0.3s;
     --transition-ease: ease;
 }
+
+
+/* ===========================
+   Fuentes personalizadas
+=========================== */
 
 @font-face {
     font-family: 'LEMONMILK';
@@ -23,6 +38,49 @@
     font-weight: normal;
     font-style: normal;
 }
+
+
+/* ===========================
+   Estilos generales
+=========================== */
+
+
+/* Reseteo de estilo global y alineación de elementos */
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Ajuste del tamaño base de la fuente */
+
+html {
+    font-size: 62.5%;
+}
+
+
+/* Estilo general del body */
+
+body {
+    padding: 20px;
+    padding-bottom: 0;
+    background-color: var(--primary-color);
+    line-height: 1.6;
+    color: var(--text-color);
+    font-size: 1.6rem;
+    font-family: var(--font-body);
+}
+
+
+/* ===========================
+   Estilo para encabezados (h1)
+=========================== */
 
 h1 {
     margin-top: -10px;
@@ -35,29 +93,10 @@ h1 {
     text-shadow: 2px 2px 4px var(--shadow-color);
 }
 
-* {
-    box-sizing: border-box;
-}
 
-html,
-body {
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    font-size: 62.5%;
-}
-
-body {
-    padding: 20px;
-    padding-bottom: 0;
-    background-color: var(--primary-color);
-    line-height: 1.6;
-    color: var(--text-color);
-    font-size: 1.6rem;
-    font-family: var(--font-body);
-}
+/* ===========================
+   Estilo de la tabla
+=========================== */
 
 table {
     width: 100%;
@@ -66,6 +105,9 @@ table {
     box-shadow: var(--shadow-color) 5px 5px 20px 5px;
 }
 
+
+/* Estilo para celdas de tabla (td y th) */
+
 td,
 th {
     display: table-cell;
@@ -73,15 +115,33 @@ th {
     text-align: left;
 }
 
+
+/* Estilo para los botones de los últimos td */
+
+#ficha {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+/* Alineación específica para la 8ª columna */
+
 th:nth-of-type(8) {
     text-align: center;
 }
+
+
+/* Estilo de las cabeceras de tabla */
 
 th {
     background-color: var(--accent-color);
     color: var(--text-color);
     font-weight: 700;
 }
+
+
+/* Estilo de las filas pares e impares */
 
 tr:nth-child(2n+2) td {
     background-color: var(--table-even-bg);
@@ -90,6 +150,11 @@ tr:nth-child(2n+2) td {
 tr:nth-child(2n+1) td {
     background-color: var(--table-odd-bg);
 }
+
+
+/* ===========================
+   Estilo de botones
+=========================== */
 
 .button {
     line-height: 1;
@@ -103,11 +168,19 @@ tr:nth-child(2n+1) td {
     transition: background-color var(--transition-speed) var(--transition-ease), transform var(--transition-speed) var(--transition-ease);
 }
 
+
+/* Estilo de los botones al pasar el cursor */
+
 .button:hover {
     background-color: var(--button-hover-bg);
     transform: scale(1.05);
     color: var(--button-hover-color);
 }
+
+
+/* ===========================
+   Estilos de paginación
+=========================== */
 
 #pagination {
     margin-top: 5px;
@@ -115,6 +188,9 @@ tr:nth-child(2n+1) td {
     width: 100%;
     justify-content: center;
 }
+
+
+/* Estilo de la lista de paginación */
 
 #pagination ul {
     padding-left: 0;
@@ -125,13 +201,34 @@ tr:nth-child(2n+1) td {
     gap: 10px;
 }
 
-.letra {
-    text-align: left;
+
+/* ===========================
+   Estilo de enlaces y enlaces activos
+=========================== */
+
+a {
+    color: var(--link-color);
+    font-size: 20px;
+    text-decoration: none;
+    transition: all var(--transition-speed) var(--transition-ease);
 }
 
-#ficha {
-    text-align: center;
+
+/* Estilo de los enlaces al pasar el cursor */
+
+a:hover {
+    color: var(--link-hover-color);
 }
+
+
+/* Estilo del enlace cuando recibe foco */
+
+a:focus {
+    outline: 2px solid var(--accent-color);
+}
+
+
+/* Estilos de los enlaces de paginación */
 
 span.page-link {
     transition: all var(--transition-speed) var(--transition-ease);
@@ -145,20 +242,10 @@ span.page-link:active {
     transform: scale(1.2);
 }
 
-a {
-    color: var(--link-color);
-    font-size: 20px;
-    text-decoration: none;
-    transition: all var(--transition-speed) var(--transition-ease);
-}
 
-a:hover {
-    color: var(--link-hover-color);
-}
-
-a:focus {
-    outline: 2px solid var(--accent-color);
-}
+/* ===========================
+   Estilos responsivos para pantallas pequeñas
+=========================== */
 
 @media (max-width: 768px) {
     h1 {
