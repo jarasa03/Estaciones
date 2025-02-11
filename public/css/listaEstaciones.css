@@ -5,11 +5,12 @@
     --text-color: #fff;
     --shadow-color: rgba(0, 0, 0, 0.2);
     --button-hover-bg: #3a7f77;
+    --button-hover-color: white;
     --table-border-color: #28333f;
     --table-even-bg: #242e39;
     --table-odd-bg: #5BB9B8;
     --link-color: #3b7d76;
-    --link-hover-color: var(--accent-color);
+    --link-hover-color: rgb(253, 166, 5);
     --font-header: 'LEMONMILK', sans-serif;
     --font-body: 'Lato', sans-serif;
     --transition-speed: 0.3s;
@@ -68,7 +69,6 @@ table {
 td,
 th {
     display: table-cell;
-    border: 1px solid var(--table-border-color);
     padding: 10px;
     text-align: center;
 }
@@ -102,6 +102,7 @@ tr:nth-child(2n+1) td {
 .button:hover {
     background-color: var(--button-hover-bg);
     transform: scale(1.05);
+    color: var(--button-hover-color);
 }
 
 #pagination {
