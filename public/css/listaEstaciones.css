@@ -1,9 +1,48 @@
+:root {
+    --primary-color: #88e4e3;
+    --secondary-color: #4b908f;
+    --accent-color: #202932;
+    --text-color: #fff;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --button-hover-bg: #3a7f77;
+    --button-hover-color: white;
+    --table-border-color: #28333f;
+    --table-even-bg: #242e39;
+    --table-odd-bg: #5BB9B8;
+    --link-color: #3b7d76;
+    --link-hover-color: rgb(253, 166, 5);
+    --font-header: 'LEMONMILK', sans-serif;
+    --font-body: 'Lato', sans-serif;
+    --transition-speed: 0.3s;
+    --transition-ease: ease;
+}
+
+@font-face {
+    font-family: 'LEMONMILK';
+    src: url('/fonts/LEMONMILK-Regular.otf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+h1 {
+    margin-top: -10px;
+    margin-bottom: 15px;
+    font-family: var(--font-header);
+    text-align: center;
+    font-weight: 300;
+    color: var(--accent-color);
+    font-size: 40px;
+    text-shadow: 2px 2px 4px var(--shadow-color);
+}
+
 * {
     box-sizing: border-box;
 }
 
-html, body {
-    overflow: hidden;
+html,
+body {
+    margin: 0;
+    padding: 0;
 }
 
 html {
@@ -12,47 +51,40 @@ html {
 
 body {
     padding: 20px;
-    background-color: #88e4e3;
+    padding-bottom: 0;
+    background-color: var(--primary-color);
     line-height: 1.6;
-    color: #fff;
+    color: var(--text-color);
     font-size: 1.6rem;
-    font-family: 'Lato', sans-serif;
-}
-
-h1 {
-    margin-top: 0;
-    text-align: center;
-    font-weight: 300;
-    color: #202932;
+    font-family: var(--font-body);
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
-    box-shadow: #37414b 5px 5px 25px;
+    box-shadow: var(--shadow-color) 5px 5px 20px 5px;
 }
 
 td,
 th {
     display: table-cell;
-    border: 1px solid #28333f;
     padding: 10px;
     text-align: center;
 }
 
 th {
-    background-color: #202932;
-    color: #fff;
+    background-color: var(--accent-color);
+    color: var(--text-color);
     font-weight: 700;
 }
 
 tr:nth-child(2n+2) td {
-    background-color: #242e39;
+    background-color: var(--table-even-bg);
 }
 
 tr:nth-child(2n+1) td {
-    background-color: #5BB9B8;
+    background-color: var(--table-odd-bg);
 }
 
 .button {
@@ -61,18 +93,29 @@ tr:nth-child(2n+1) td {
     font-size: 1.2rem;
     text-decoration: none;
     border-radius: 5px;
-    color: #fff;
+    color: var(--text-color);
     padding: 8px;
-    background-color: #4b908f;
+    background-color: var(--secondary-color);
+    transition: background-color var(--transition-speed) var(--transition-ease), transform var(--transition-speed) var(--transition-ease);
+}
+
+.button:hover {
+    background-color: var(--button-hover-bg);
+    transform: scale(1.05);
+    color: var(--button-hover-color);
 }
 
 #pagination {
+    margin-top: 5px;
     display: flex;
-    width: 100vw;
+    width: 100%;
     justify-content: center;
 }
 
 #pagination ul {
+    padding-left: 0;
+    margin-left: 0;
+    align-items: center;
     list-style-type: none;
     display: flex;
     gap: 10px;
@@ -88,4 +131,40 @@ tr:nth-child(2n+1) td {
 
 #ficha {
     text-align: center;
+}
+
+span.page-link {
+    transition: all var(--transition-speed) var(--transition-ease);
+    color: var(--table-border-color);
+    font-size: 20px;
+    transform: scale(1.2);
+}
+
+span.page-link:active {
+    font-size: 20px;
+    transform: scale(1.2);
+}
+
+a {
+    color: var(--link-color);
+    font-size: 20px;
+    text-decoration: none;
+    transition: all var(--transition-speed) var(--transition-ease);
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+a:focus {
+    outline: 2px solid var(--accent-color);
+}
+
+@media (max-width: 768px) {
+    h1 {
+        font-size: 30px;
+    }
+    table {
+        font-size: 1.4rem;
+    }
 }

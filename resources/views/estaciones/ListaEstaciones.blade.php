@@ -6,8 +6,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Estaciones</title>
+
+    <!-- Preload de la fuente -->
+    <link rel="preload" href="{{ asset('fonts/LEMONMILK-Regular.otf') }}" as="font" type="font/otf"
+        crossorigin="anonymous">
+
+    <!-- CSS -->
     <link href="{{ asset('css/listaEstaciones.css') }}" rel="stylesheet">
 </head>
+
 
 <body>
     <h1>Lista de Estaciones</h1>
@@ -35,7 +42,8 @@
                     <td class="num">{{ $estacion->longitud }}</td>
                     <td class="num">{{ $estacion->altitud }}</td>
                     <td class="letra">{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
-                    <td id="ficha"><a class="button" href="{{ route('estaciones.ficha', ['id' => $estacion->id]) }}">Ver ficha</a>
+                    <td id="ficha"><a class="button"
+                            href="{{ route('estaciones.ficha', ['id' => $estacion->id]) }}">Ver ficha</a>
                     </td>
                 </tr>
             @empty
