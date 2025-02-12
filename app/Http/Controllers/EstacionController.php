@@ -16,22 +16,34 @@ class EstacionController extends Controller
 {
 
     /**
-     * Muestra la ficha de una estación específica.
+     * Muestra la ficha de una estación basada en el ID proporcionado.
      *
-     * @param int $id Identificador de la estación.
-     * @return \Illuminate\View\View Vista con la información de la estación.
-     * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException Si la estación no se encuentra.
+     * Este método obtiene la información de la estación desde una fuente externa (probablemente una API o servicio),
+     * decodifica la respuesta en formato JSON y la pasa a la vista correspondiente. Si no se encuentra la estación,
+     * se aborta la solicitud con un error 404.
+     *
+     * @param  int  $id  El ID de la estación cuya información se desea mostrar.
+     * @return \Illuminate\View\View  La vista con los datos de la estación o un error 404 si no se encuentra.
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException  Si la estación no es encontrada, se aborta con un error 404.
      */
     public function fichaEstacion($id)
     {
-        $estacion = EstacionInv::find($id); // Busca la estación por ID
+        // Llamar al método obtenerEstacion para obtener los datos en formato JSON
+        $response = $this->obtenerEstacion($id);
 
-        if (!$estacion) {
+        // Decodificar la respuesta JSON para convertirla en un array
+        $estacion = json_decode($response->getContent(), true);
+
+        // Verificar si la estación fue encontrada y la información fue procesada correctamente
+        if (isset($estacion['error'])) {
             abort(404, 'Estación no encontrada');
         }
 
+        // Pasar los datos como un array a la vista
         return view('estaciones.FichaEstacion', compact('estacion'));
     }
+
 
     /**
      * Muestra una lista paginada de estaciones.
@@ -40,12 +52,13 @@ class EstacionController extends Controller
      */
     public function index()
     {
-        // Recuperar todas las estaciones
-        $estaciones = EstacionInv::paginate(9);
+        // Llamar a la función listarEstaciones y obtener los datos como array
+        $estaciones = $this->listarEstaciones()->getData();
 
-        // Retornar la vista y pasar las estaciones
+        // Retornar la vista pasando las estaciones como array
         return view('estaciones.ListaEstaciones', compact('estaciones'));
     }
+
 
     /**
      * Valida que el ID proporcionado sea un número entero válido.

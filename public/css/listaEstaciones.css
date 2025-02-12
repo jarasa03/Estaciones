@@ -103,6 +103,7 @@ table {
     border-collapse: collapse;
     table-layout: fixed;
     box-shadow: var(--shadow-color) 5px 5px 20px 5px;
+    margin-bottom: 20px;
 }
 
 

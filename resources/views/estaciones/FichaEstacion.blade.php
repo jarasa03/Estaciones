@@ -20,13 +20,13 @@
 
     <div id="contenedorP">
         <div id="contenedorH">
-            <h1 id="estacion">{{ $estacion->nombre }}</h1>
-            <p><strong>ID:</strong> <span>{{ $estacion->id }}</span></p>
-            <p><strong>Provincia:</strong> <span>{{ $estacion->provincia }}</span></p>
-            <p><strong>Latitud:</strong> <span>{{ $estacion->latitud }}</span></p>
-            <p><strong>Longitud:</strong> <span>{{ $estacion->longitud }}</span></p>
-            <p><strong>Altitud:</strong> <span>{{ $estacion->altitud }}</span></p>
-            <p><strong>Estado:</strong> <span>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</p>
+            <h1 id="estacion">{{ $estacion['nombre'] }}</h1>
+            <p><strong>ID:</strong> <span>{{ $estacion['id'] }}</span></p>
+            <p><strong>Provincia:</strong> <span>{{ $estacion['provincia'] }}</span></p>
+            <p><strong>Latitud:</strong> <span>{{ $estacion['x'] }}</span></p>
+            <p><strong>Longitud:</strong> <span>{{ $estacion['y'] }}</span></p>
+            <p><strong>Altitud:</strong> <span>{{ $estacion['altitud'] }}</span></p>
+            <p><strong>Estado:</strong> <span>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion['estado']) }}</p>
         </div>
     </div>
     <a class="button" href="{{ route('estaciones.index') }}">Volver a la lista de estaciones</a>

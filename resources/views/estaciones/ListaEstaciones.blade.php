@@ -38,8 +38,8 @@
                     <td>{{ $estacion->id }}</td>
                     <td>{{ $estacion->nombre }}</td>
                     <td>{{ $estacion->provincia }}</td>
-                    <td>{{ $estacion->latitud }}</td>
-                    <td>{{ $estacion->longitud }}</td>
+                    <td>{{ $estacion->x }}</td>
+                    <td>{{ $estacion->y }}</td>
                     <td>{{ $estacion->altitud }}</td>
                     <td>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion->estado) }}</td>
                     <td id="ficha"><a class="button"
@@ -51,11 +51,8 @@
                     <td colspan="8">No hay estaciones disponibles.</td>
                 </tr>
             @endforelse
-        </tbody>
+        </tbody>        
     </table>
-    <div id="pagination">
-        {{ $estaciones->links('pagination::bootstrap-4') }} {{-- Esto agregará los controles de paginación --}}
-    </div>
 </body>
 
 </html>
