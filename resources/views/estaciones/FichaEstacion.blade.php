@@ -26,9 +26,26 @@
             <p><strong>Latitud:</strong> <span>{{ $estacion['x'] }}</span></p>
             <p><strong>Longitud:</strong> <span>{{ $estacion['y'] }}</span></p>
             <p><strong>Altitud:</strong> <span>{{ $estacion['altitud'] }}</span></p>
-            <p><strong>Estado:</strong> <span>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion['estado']) }}</p>
+            <p><strong>Estado:</strong>
+                <span>{{ \App\Helpers\EstadoHelper::obtenerEstado($estacion['estado']) }}</span>
+            </p>
         </div>
+
+        <!-- Formulario para actualizar el estado de la estación -->
+        <form action="{{ route('estaciones.actualizarEstado', ['id' => $estacion['id']]) }}" method="POST">
+            @csrf
+            @method('PUT') <!-- Esto indica que la solicitud es PUT, pero no es necesario para validar el estado -->
+
+            <label for="estado">Estado:</label>
+            <select name="estado" id="estado">
+                <option value="0" {{ $estacion['estado'] == 0 ? 'selected' : '' }}>Inactivo</option>
+                <option value="1" {{ $estacion['estado'] == 1 ? 'selected' : '' }}>Activo</option>
+            </select>
+
+            <button type="submit">Actualizar Estado</button>
+        </form>
     </div>
+
     <a class="button" href="{{ route('estaciones.index') }}">Volver a la lista de estaciones</a>
 
 </body>
