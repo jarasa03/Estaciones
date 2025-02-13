@@ -79,45 +79,38 @@ class EstacionController extends Controller
     }
 
     /**
-     * Obtiene y devuelve la lista de todas las estaciones con su estado asociado.
+     * Obtiene una lista de estaciones que existen en la tabla estacion_bd 
+     * y complementa su información con los datos de estacion_inv.
      *
-     * Este método recupera todas las estaciones desde la base de datos,
-     * incluyendo su relación con la tabla de estados, y transforma los datos en un formato simplificado.
-     * Cada estación incluye su ID, nombre, provincia, identificador, coordenadas (latitud y longitud), 
-     * altitud, y el estado de la estación (activo/inactivo).
+     * @return \Illuminate\Http\JsonResponse JSON con la lista de estaciones filtradas.
      *
-     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con la lista de estaciones o un error en caso de fallo.
-     * 
-     * @throws Throwable Captura cualquier excepción durante el proceso y devuelve un error con código 500.
+     * @throws \Throwable Captura cualquier excepción y devuelve un error 500 en caso de fallo.
      */
     public function listarEstaciones()
     {
         try {
-            // Se obtienen todas las estaciones junto con su estado relacionado
-            // "with('estado')" hace que se cargue la relación 'estado' (esto evita consultas extra)
-            $estaciones = EstacionInv::with('estado')->get()->transform(function ($estacion) {
-                // Aquí estamos creando una nueva estructura para cada estación.
+            // Obtener solo los IDs que existen en estacion_bd
+            $idsEstacionesBd = EstacionBd::pluck('id')->toArray();
+
+            // Obtener las estaciones de estacion_inv que coincidan con los IDs de estacion_bd
+            $estaciones = EstacionInv::whereIn('id', $idsEstacionesBd)->get()->map(function ($estacionInv) {
+                // Obtener el estado desde estacion_bd (relacionado por el mismo ID)
+                $estadoBd = EstacionBd::find($estacionInv->id);
+
                 return [
-                    // Estos son los atributos de la estación que queremos devolver
-                    'id' => $estacion->id,
-                    'nombre' => $estacion->nombre,
-                    'provincia' => $estacion->provincia,
-                    'idema' => $estacion->idema,
-                    'x' => $estacion->latitud,
-                    'y' => $estacion->longitud,
-                    'altitud' => $estacion->altitud,
-                    // Aquí manejamos el estado de la estación.
-                    // Si la estación tiene un estado (relación cargada con 'estado'),
-                    // se comprueba si ese estado es 1. Si es 1, asignamos 'active', si no, 'inactive'.
-                    // Si no tiene estado asociado, también se devuelve 'inactive'.
-                    'estado' => $estacion->estado ? ($estacion->estado->estado == 1 ? 'active' : 'inactive') : 'inactive'
+                    'id' => $estacionInv->id,
+                    'nombre' => $estacionInv->nombre,
+                    'provincia' => $estacionInv->provincia,
+                    'idema' => $estacionInv->idema,
+                    'x' => $estacionInv->latitud,
+                    'y' => $estacionInv->longitud,
+                    'altitud' => $estacionInv->altitud,
+                    'estado' => $estadoBd && $estadoBd->estado == 1 ? 'active' : 'inactive', // Tomamos el estado desde estacion_bd
                 ];
             });
-            // Finalmente, se devuelve la colección de estaciones en formato JSON con un código de respuesta 201
+
             return response()->json($estaciones, 201);
         } catch (Throwable $e) {
-            // Si ocurre algún error durante el proceso, lo capturamos aquí
-            // Se guarda un log con el mensaje de error y se devuelve un error genérico
             Log::error('Error al obtener estaciones: ' . $e->getMessage());
             return response()->json(['error' => 'Error al obtener estaciones'], 500);
         }
