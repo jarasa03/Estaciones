@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Validation\ValidationException;
 use Exception;
 use Throwable;
 
@@ -80,27 +79,6 @@ class EstacionController extends Controller
     }
 
     /**
-     * Función externa para validar los datos de la estación.
-     *
-     * @param Request $request El objeto de la solicitud HTTP.
-     * @return array Los datos validados de la estación.
-     * @throws ValidationException Si la validación falla.
-     */
-    private function validarDatosEstacion(Request $request)
-    {
-        Log::info("Iniciando validación de los datos.");
-        return $request->validate([
-            'nombre'    => 'required|string|max:255',
-            'idema'     => 'required|string|max:50',
-            'provincia' => 'required|string|max:255',
-            'x'         => 'required|numeric',
-            'y'         => 'required|numeric',
-            'altitud'   => 'required|integer',
-            'estado'    => 'required|integer'
-        ]);
-    }
-
-    /**
      * Obtiene y devuelve la lista de todas las estaciones con su estado asociado.
      *
      * Este método recupera todas las estaciones desde la base de datos,
@@ -146,73 +124,59 @@ class EstacionController extends Controller
     }
 
     /**
-     * Crea una nueva estación en las tablas `estacion_inv` y `estacion_bd`.
+     * Mueve una estación de la tabla `estacion_inv` a la tabla `estacion_bd` si no existe previamente.
      *
-     * Esta función valida los datos recibidos en la solicitud, crea una nueva estación en la tabla
-     * `estacion_inv` con la información proporcionada y luego crea una entrada correspondiente
-     * en la tabla `estacion_bd` con el estado de la estación.
-     * Si la validación de datos falla, devuelve un error con los detalles de la validación.
-     * Si ocurre un error durante la creación de la estación o la inserción en las tablas,
-     * devuelve un error con el mensaje correspondiente.
+     * Este método valida el ID de la estación, verifica si ya está en `estacion_bd` y, si no es así,
+     * intenta moverla desde `estacion_inv` a `estacion_bd`. Si la estación ya está en `estacion_bd`,
+     * se retorna un mensaje indicando que no es necesario moverla. Si la estación no se encuentra en
+     * `estacion_inv`, se retorna un error 404.
      *
-     * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene los datos de la estación.
-     * 
-     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el ID de la máquina (estación) creada,
-     *         o un error con el mensaje adecuado si ocurre una excepción.
-     * 
-     * @throws \Illuminate\Validation\ValidationException Si la validación de los datos falla.
-     * @throws \Throwable Si ocurre un error durante la creación de la estación o la inserción en la base de datos.
+     * @param  int  $id  El ID de la estación a mover.
+     * @return \Illuminate\Http\JsonResponse  Respuesta JSON indicando el estado de la operación.
+     *
+     * @throws \Exception  Si ocurre un error al mover la estación o al interactuar con la base de datos.
      */
-    public function crearEstacion(Request $request)
+    public function moverEstacionAEstacionBd($id): JsonResponse
     {
         try {
-            // Validación de datos
-            Log::info("Validando datos de la estación.");
-            $data = $this->validarDatosEstacion($request);
-            Log::info("Datos validados correctamente.", ['data' => $data]);
-        } catch (ValidationException $e) {
-            // Si la validación falla, captura la excepción y devuelve un error personalizado
-            Log::error('Error al validar los datos: ' . $e->getMessage(), ['errors' => $e->errors()]);
-            return response()->json([
-                'error' => 'Datos inválidos',
-                'message' => 'Por favor revisa los campos proporcionados',
-                'details' => $e->errors() // Devuelve los errores específicos de la validación
-            ], 422); // Código de estado 422 para errores de validación
-        }
-        try {
-            // Crear una nueva estación en la tabla estacion_inv
-            Log::info("Creando nueva estación en la tabla 'estacion_inv'.");
-            $estacion = new EstacionInv();
-            $estacion->nombre = $data['nombre'];
-            $estacion->idema = $data['idema'];
-            $estacion->provincia = $data['provincia'];
-            $estacion->latitud = $data['x']; // Guardamos la latitud
-            $estacion->longitud = $data['y']; // Guardamos la longitud
-            $estacion->altitud = $data['altitud'];
-            $estacion->save();
-            $estacion->refresh(); // Recargar el modelo para obtener el ID generado
+            Log::info("Intentando mover estación con ID: {$id}");
 
-            Log::info("Estación creada en 'estacion_inv' con ID: {$estacion->id}");
+            // Validamos el ID antes de continuar
+            $id = $this->validarIdEntero($id);
+            Log::info("ID validado correctamente: {$id}");
 
-            // Crear una entrada en estacion_bd con el mismo ID
-            Log::info("Creando nueva entrada en la tabla 'estacion_bd' con el ID: {$estacion->id}.");
-            $estacionBd = new EstacionBd();
-            $estacionBd->id = $estacion->id; // Asociamos el mismo ID de estacion_inv
-            $estacionBd->estado = $data['estado']; // Guardamos el estado (activo/inactivo)
-            $estacionBd->save();
-            $estacionBd->refresh(); // Recargar el modelo
+            // Buscamos la estación en estacion_bd
+            $estacionBd = EstacionBd::find($id);
 
-            Log::info("Entrada creada en 'estacion_bd' con estado: {$estacionBd->estado}");
+            // Si la estación ya existe en estacion_bd, retornamos un mensaje indicando que no es necesario moverla
+            if ($estacionBd) {
+                Log::info("La estación con ID {$id} ya existe en estacion_bd");
+                return response()->json(["message" => "La estación ya existe en estacion_bd"], 400);
+            }
 
-            // Retornar solo el id de la estación creada
-            Log::info("Retornando datos de la estación creada.");
-            return response()->json([
-                'id' => $estacion->id
-            ], 201);
-        } catch (Throwable $e) {
-            // Registrar el error y retornar una respuesta con código 500
-            Log::error('Error al insertar la estación: ' . $e->getMessage(), ['exception' => $e]);
-            return response()->json(['error' => "Error al insertar la estación: " . $e->getMessage()], 500);
+            // Si no está en estacion_bd, buscamos en estacion_inv
+            $estacionInv = EstacionInv::find($id);
+
+            if (!$estacionInv) {
+                // Si la estación no se encuentra en estacion_inv, retornamos un error 404
+                Log::warning("No se encontró la estación con ID {$id} en estacion_inv");
+                return response()->json(["message" => "La estación no existe en estacion_inv"], 404);
+            }
+
+            // Si la estación existe en estacion_inv, la insertamos en estacion_bd
+            $nuevaEstacionBd = new EstacionBd();
+            $nuevaEstacionBd->id = $estacionInv->id;
+            $nuevaEstacionBd->estado = $estacionInv->estado; // Suponiendo que el estado es un campo en estacion_inv
+
+            // Guardamos la nueva estación en estacion_bd
+            $nuevaEstacionBd->save();
+
+            Log::info("Estación con ID {$id} movida correctamente de estacion_inv a estacion_bd");
+
+            return response()->json(["message" => "Estación movida correctamente a estacion_bd"], 200);
+        } catch (Exception $e) {
+            Log::error("Error al mover estación con ID {$id}: " . $e->getMessage());
+            return response()->json(["error" => "Error al mover estación con id {$id}"], 500);
         }
     }
 
@@ -326,18 +290,17 @@ class EstacionController extends Controller
     }
 
     /**
-     * Elimina una estación de la base de datos si existe en alguna de las dos tablas (`estacion_bd` o `estacion_inv`).
+     * Elimina una estación de la base de datos en la tabla `estacion_bd` usando su ID.
      *
-     * Este método intenta eliminar la estación con el ID proporcionado, buscando primero en la tabla `estacion_bd`
-     * y luego en la tabla `estacion_inv`. Si no se encuentra la estación en ninguna de las tablas, se retorna un error 404.
-     * Si se encuentra y elimina correctamente, se devuelve un mensaje de éxito.
-     * En caso de cualquier error, se retorna un mensaje de error 500.
+     * Este método valida el ID de la estación, luego intenta encontrar la estación
+     * en la tabla `estacion_bd`. Si la estación es encontrada, se elimina de la base de datos.
+     * Si la estación no se encuentra o ocurre algún error durante el proceso, se devuelve
+     * un mensaje adecuado en formato JSON.
      *
-     * @param int|string $id El ID de la estación a eliminar. Puede ser un número entero o una cadena que represente el ID.
+     * @param  int  $id  El ID de la estación a eliminar.
+     * @return \Illuminate\Http\JsonResponse  Respuesta JSON con el resultado de la operación.
      * 
-     * @return \Illuminate\Http\JsonResponse Respuesta en formato JSON con el resultado de la operación.
-     * 
-     * @throws Exception Si ocurre un error durante el proceso de eliminación, se captura y retorna un error con código 500.
+     * @throws \Exception Si ocurre un error durante el proceso de eliminación.
      */
     public function eliminarEstacion($id): JsonResponse
     {
@@ -348,24 +311,24 @@ class EstacionController extends Controller
             $id = $this->validarIdEntero($id);
             Log::info("ID validado correctamente: {$id}");
 
+            // Buscamos la estación en la tabla estacion_bd
             $estacionBd = EstacionBd::find($id);
-            $estacionInv = EstacionInv::find($id);
 
-            // Si no se encuentra en ninguna tabla, retornamos un error 404
-            if (!$estacionBd && !$estacionInv) {
-                Log::warning("No se encontró ninguna estación con ID {$id}");
-                return response()->json(["message" => "La estación {$id} no existe"], 404);
+            // Si no se encuentra en estacion_bd, retornamos un error 404
+            if (!$estacionBd) {
+                Log::warning("No se encontró ninguna estación con ID {$id} en estacion_bd");
+                return response()->json(["message" => "La estación {$id} no existe en estacion_bd"], 404);
             }
 
-            // Eliminamos si existen
-            if ($estacionBd) {
-                $estacionBd->delete();
+            Log::info("Estación obtenida de estacion_bd: " . $estacionBd);
+
+            // Intentamos eliminar la estación de la tabla estacion_bd
+            $deleted = $estacionBd->delete();
+
+            if ($deleted) {
                 Log::info("Estación eliminada de la tabla estacion_bd con ID {$id}");
-            }
-
-            if ($estacionInv) {
-                $estacionInv->delete();
-                Log::info("Estación eliminada de la tabla estacion_inv con ID {$id}");
+            } else {
+                Log::warning("No se pudo eliminar la estación con ID {$id} de estacion_bd");
             }
 
             Log::info("Estación con ID {$id} eliminada correctamente");
