@@ -245,28 +245,28 @@ class EstacionController extends Controller
             $request->validate([
                 'estado' => 'required|boolean',
             ]);
-
+    
             // Buscar la estación en la base de datos
             $estacionBd = EstacionBd::find($id);
-
+    
             if (!$estacionBd) {
                 Log::warning("No se encontró estación con ID {$id} en la base de datos.");
-                return response()->json(["message" => "La estación {$id} no existe en estacion_bd"], 404);
+                return redirect()->back()->with('error', "La estación {$id} no existe en estacion_bd");
             }
-
+    
             // Verificar si el estado actual ya es el mismo que el solicitado
             if ($estacionBd->estado === $request->estado) {
-                return response()->json(["message" => "El estado ya está configurado como se desea"], 200);
+                return redirect()->back()->with('message', "El estado ya está configurado como se desea");
             }
-
+    
             // Actualizar estado de la estación
             $estacionBd->estado = $request->estado;
             $estacionBd->save();
-
-            return response()->json(["message" => "Estado actualizado correctamente"], 200);
+    
+            return redirect()->back()->with('message', "Estado actualizado correctamente");
         } catch (Exception $e) {
             Log::error("Error al actualizar el estado de la estación con ID {$id}: " . $e->getMessage());
-            return response()->json(["error" => "Error al actualizar el estado de la estación"], 500);
+            return redirect()->back()->with('error', "Error al actualizar el estado de la estación");
         }
     }
 
