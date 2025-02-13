@@ -27,6 +27,7 @@
     --transition-ease: ease;
 }
 
+
 /* ===========================
    Fuentes personalizadas
 =========================== */
@@ -37,6 +38,7 @@
     font-weight: normal;
     font-style: normal;
 }
+
 
 /* ========================= 
    Estilos globales
@@ -56,6 +58,7 @@ body {
 * {
     box-sizing: border-box;
 }
+
 
 /* =========================
    Estilos de contenedores
@@ -92,6 +95,7 @@ body {
     font-family: var(--font-header);
     background-color: var(--secondary-color);
     transition: background-color var(--transition-speed) var(--transition-ease), transform var(--transition-speed) var(--transition-ease);
+    border: 1px solid #24544e;
 }
 
 .button:hover {
@@ -99,6 +103,7 @@ body {
     transform: scale(1.05);
     color: var(--button-hover-color);
 }
+
 
 /* =========================
    Estilos tipográficos
@@ -113,6 +118,30 @@ h1 {
     color: var(--accent-color);
     font-size: 40px;
     text-shadow: 2px 2px 4px var(--shadow-color);
+}
+
+label {
+    font-family: var(--font-header);
+    margin-right: 10px;
+}
+
+#estado {
+    margin-right: 10px;
+    background-color: var(--button-bg);
+    border: 1px solid #24544e;
+    color: var(--text-color);
+    font: var(--font-header);
+    border-radius: 5px;
+    font-size: 20px;
+    height: 33px;
+    margin-top: 20px;
+}
+
+#estado option {
+    font: var(--font-header);
+    font-size: 20px;
+    background-color: var(--button-bg);
+    color: black;
 }
 
 #estacion {

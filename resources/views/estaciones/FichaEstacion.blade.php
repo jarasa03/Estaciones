@@ -42,7 +42,7 @@
                 <option value="1" {{ $estacion['estado'] == 1 ? 'selected' : '' }}>Activo</option>
             </select>
 
-            <button type="submit">Actualizar Estado</button>
+            <button class="button" type="submit">Actualizar Estado</button>
         </form>
     </div>
 
